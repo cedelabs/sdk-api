@@ -5,7 +5,7 @@ import {
 } from "@cedelabs-private/sdk";
 import express, { Express, Request, Response } from "express";
 import bodyParser from "body-parser";
-import { setupCedeSdk } from "./sdk";
+import { setupCedeSdk } from "./utils/sdk";
 import { SdkApiConfiguration } from "./types";
 import { processError } from "./utils";
 
@@ -15,6 +15,27 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
 	const port = process.env.PORT || 3000;
 
 	app.use(bodyParser.json());
+
+	if (configuration.authentication) {
+		app.use(async (req, res, next) => {
+			const isAuthenticated = await configuration.authentication?.(
+				req,
+				res,
+				next
+			);
+			if (isAuthenticated === false) {
+				res.status(401).json({ message: "Unauthorized" });
+				return;
+			}
+
+			if (isAuthenticated === true) {
+				next();
+				return;
+			}
+			// If the function does not return a value, it is expected to either call next() to continue the request lifecycle 
+			// or explicitly reject the request.
+		});
+	}
 
 	app.get("/", (_: Request, res: Response) => {
 		res.send("CedeLabs SDK API");

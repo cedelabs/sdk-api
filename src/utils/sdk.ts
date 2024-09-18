@@ -1,5 +1,5 @@
 import CedeSDK, { CedeSDKEvents, EventEmitterDataTypes, HydrationItem } from "@cedelabs-private/sdk";
-import { SdkApiConfiguration } from "./types";
+import { SdkApiConfiguration } from "../types";
 
 export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 	const sdk = new CedeSDK(configuration.mode, {

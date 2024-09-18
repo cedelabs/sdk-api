@@ -1,4 +1,5 @@
 import { Any, SdkCacheStorage, CredentialsStorage, DefiInfoTx, EventEmitterDataTypes, PureCefiInfoTx, PureTransaction } from "@cedelabs-private/sdk";
+import { NextFunction, Request, Response } from "express";
 
 
 
@@ -55,4 +56,20 @@ export type SdkApiConfiguration = {
 	 * The headers to be sent with the webhook request (when webhook parameter is provided in the request).
 	 */
 	webhookHeaders?: Record<string, string>;
+
+	/**
+	 * This middleware is responsible for authorizing or blocking incoming requests based on custom logic.
+	 *
+	 * If the function returns false, the request will be blocked, and no further processing will occur.
+	 *
+	 * If the function returns true, the request will be authorized and allowed to proceed.
+	 *
+	 * If the function does not return a value, it is expected to either call next() to continue the request lifecycle 
+	 * or explicitly reject the request.
+	 */
+	authentication?: (
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) => Promise<boolean | void>;
 };

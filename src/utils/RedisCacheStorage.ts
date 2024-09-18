@@ -2,7 +2,7 @@ import { Any, SdkCacheStorage, SDKCacheItem } from "@cedelabs-private/sdk";
 import { createClient, RedisClientType } from "redis";
 import { safeJsonParse } from "./json";
 
-type RedisCacheStorageConfig = {
+export type RedisCacheStorageConfig = {
 	url: string;
 };
 
@@ -52,7 +52,6 @@ export class RedisCacheStorage implements SdkCacheStorage {
 	}
 
 	async removeByIncludedStrings(includedStrings: string[]): Promise<string[]> {
-		console.log("includedStrings", includedStrings);
 		const deletedKeys: string[] = [];
 		const iterator = this.client.scanIterator({
 			TYPE: "string",
