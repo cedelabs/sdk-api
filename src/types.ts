@@ -1,7 +1,15 @@
 import { Any, SdkCacheStorage, CredentialsStorage, DefiInfoTx, EventEmitterDataTypes, PureCefiInfoTx, PureTransaction } from "@cedelabs-private/sdk";
 import { NextFunction, Request, Response } from "express";
 
+export type AuthenticationMiddleware = (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => Promise<boolean | void> | boolean | void;
 
+export type AuthenticationMiddlewareFactory<T extends Record<string, any>> = (
+	config: T
+) => AuthenticationMiddleware;
 
 export type SdkApiConfiguration = {
 	/**
@@ -55,7 +63,7 @@ export type SdkApiConfiguration = {
 	/**
 	 * The headers to be sent with the webhook request (when webhook parameter is provided in the request).
 	 */
-	webhookHeaders?: Record<string, string>;
+	webhookHeaders?: (req: Request) =>( Record<string, string> | Promise<Record<string, string>>);
 
 	/**
 	 * This middleware is responsible for authorizing or blocking incoming requests based on custom logic.
@@ -64,12 +72,8 @@ export type SdkApiConfiguration = {
 	 *
 	 * If the function returns true, the request will be authorized and allowed to proceed.
 	 *
-	 * If the function does not return a value, it is expected to either call next() to continue the request lifecycle 
+	 * If the function does not return a value, it is expected to either call next() to continue the request lifecycle
 	 * or explicitly reject the request.
 	 */
-	authentication?: (
-		req: Request,
-		res: Response,
-		next: NextFunction
-	) => Promise<boolean | void>;
+	authentication?: AuthenticationMiddleware;
 };

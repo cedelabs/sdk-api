@@ -81,7 +81,7 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
 								method: "POST",
 								headers: {
 									"Content-Type": "application/json",
-									...configuration.webhookHeaders,
+									...await configuration.webhookHeaders?.(req),
 								},
 								body: JSON.stringify(tx),
 							});

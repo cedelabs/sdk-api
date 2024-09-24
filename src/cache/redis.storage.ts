@@ -1,6 +1,6 @@
 import { Any, SdkCacheStorage, SDKCacheItem } from "@cedelabs-private/sdk";
 import { createClient, RedisClientType } from "redis";
-import { safeJsonParse } from "./json";
+import { safeJsonParse } from "../utils/json";
 
 export type RedisCacheStorageConfig = {
 	url: string;
@@ -43,11 +43,11 @@ export class RedisCacheStorage implements SdkCacheStorage {
 		return data;
 	}
 	async set(key: string, value: SDKCacheItem<Any>): Promise<void> {
-		console.log("key", key), value;
-		await this.client.set(key, JSON.stringify(value));
+		await this.client.set(key, JSON.stringify(value), {
+			PXAT: value.expiry,
+		});
 	}
 	async remove(key: string): Promise<void> {
-		console.log("Remove key", key);
 		await this.client.del(key);
 	}
 
