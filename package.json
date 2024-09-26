@@ -1,0 +1,25 @@
+{
+	"name": "@cedelabs/sdk-http-api",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/index",
+		"build": "npx pkgroll",
+		"start": "node dist/index.js"
+	},
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"express": "^4.21.0",
+		"redis": "^4.7.0",
+		"@cedelabs-private/sdk": "^1.13.2"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.21",
+		"@types/node": "^22.5.5",
+		"pkgroll": "^2.5.0",
+		"tsx": "^4.19.1",
+		"typescript": "^5.6.2"
+	}
+}
