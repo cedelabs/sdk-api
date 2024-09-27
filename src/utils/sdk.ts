@@ -11,7 +11,7 @@ export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 
 	if (configuration.listenerByEvent) {
 		Object.entries(configuration.listenerByEvent).forEach(([event, listener]) => {
-      sdk.eventEmitter.on(event as keyof EventEmitterDataTypes, listener);
+      sdk.eventEmitter.on(event as keyof EventEmitterDataTypes, listener as any);
     });
 	}
 

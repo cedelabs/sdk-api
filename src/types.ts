@@ -1,4 +1,12 @@
-import { Any, SdkCacheStorage, CredentialsStorage, DefiInfoTx, EventEmitterDataTypes, PureCefiInfoTx, PureTransaction } from "@cedelabs-private/sdk";
+import {
+	Any,
+	SdkCacheStorage,
+	CredentialsStorage,
+	DefiInfoTx,
+	EventEmitterDataTypes,
+	PureCefiInfoTx,
+	PureTransaction,
+} from "@cedelabs-private/sdk";
 import { NextFunction, Request, Response } from "express";
 
 export type AuthenticationMiddleware = (
@@ -39,12 +47,11 @@ export type SdkApiConfiguration = {
 	/**
 	 * Plug in your own event listeners for the SDK by event name.
 	 */
-	listenerByEvent?: Record<
-		keyof EventEmitterDataTypes,
-		(
-			data: EventEmitterDataTypes[keyof EventEmitterDataTypes]
-		) => void | Promise<void>
-	>;
+	listenerByEvent?: Partial<{
+		[K in keyof EventEmitterDataTypes]: (
+			params: EventEmitterDataTypes[K]
+		) => void | Promise<void>;
+	}>;
 	/**
 	 * Plug in your own event listener for the SDK.
 	 */
@@ -63,7 +70,9 @@ export type SdkApiConfiguration = {
 	/**
 	 * The headers to be sent with the webhook request (when webhook parameter is provided in the request).
 	 */
-	webhookHeaders?: (req: Request) =>( Record<string, string> | Promise<Record<string, string>>);
+	webhookHeaders?: (
+		req: Request
+	) => Record<string, string> | Promise<Record<string, string>>;
 
 	/**
 	 * This middleware is responsible for authorizing or blocking incoming requests based on custom logic.
