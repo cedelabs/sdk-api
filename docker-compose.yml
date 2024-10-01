@@ -9,6 +9,12 @@ services:
         - aws_secret_access_key
     ports:
       - "3000:3000"
+    environment:
+      - CLIENT_ID=${CEDE_CLIENT_ID}
+      - SECRET_API_KEY=${CEDE_SECRET_API_KEY}
+      - REDIS_URL=${REDIS_URL}
+      - PORT=3000
+      - NODE_ENV=production
 
     
 secrets:
