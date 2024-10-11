@@ -18,16 +18,15 @@ COPY --chown=node:node . ./
 # Install aws cli
 RUN apk update && apk add aws-cli
 
+# Accept AWS credentials as build arguments
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 
-# Set the aws credentials 
-RUN --mount=type=secret,id=aws_access_key_id \
- echo $aws_access_key_id # would output "foo".
-
-RUN --mount=type=secret,id=aws_access_key_id \
- aws configure set aws_access_key_id $(cat /run/secrets/aws_access_key_id)
-RUN --mount=type=secret,id=aws_secret_access_key \
- aws configure set aws_secret_access_key $(cat /run/secrets/aws_secret_access_key)
-RUN aws configure set region eu-west-1
+# Configure AWS CLI with the passed-in credentials
+RUN echo "Using AWS Access Key: $AWS_ACCESS_KEY_ID" && \
+    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && \
+    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && \
+    aws configure set region eu-west-1
 
 # Login to AWS CodeArtifact
 RUN aws codeartifact login --tool npm --repository cedelabs-private --domain cedelabs-private --domain-owner 343260416470 --region eu-west-1 --namespace @cedelabs-private

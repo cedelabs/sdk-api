@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { InMemoryCacheStorage } from "@cedelabs-private/sdk";
+import { env } from "process";
 import { sdkApi } from "./app";
 import { hmacAuthStrategyMiddleware } from "./authentication/hmac.strategy";
 import { RedisCacheStorage } from "./cache/redis.storage";
@@ -20,7 +21,7 @@ sdkApi({
 	mode: "REAL",
 	clientId: process.env.CLIENT_ID || "",
 	cache: getCache(),
-	authentication: hmacAuthStrategyMiddleware({
+	authentication: env.DEMO === "true" ? () => true :  hmacAuthStrategyMiddleware({
 		secretKey:  process.env.SECRET_API_KEY || "",
 	}),
 });

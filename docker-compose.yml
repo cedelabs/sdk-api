@@ -4,9 +4,9 @@ services:
   sdk-api:
     build:
       context: .
-      secrets:
-        - aws_access_key_id
-        - aws_secret_access_key
+    args:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     ports:
       - "3000:3000"
     environment:
