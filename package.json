@@ -12,6 +12,8 @@
 	"dependencies": {
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
+		"mongoose": "^8.7.1",
+		"object-sizeof": "^2.6.5",
 		"redis": "^4.7.0",
 		"@cedelabs-private/sdk": "^1.14.0"
 	},
