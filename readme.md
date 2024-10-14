@@ -21,7 +21,7 @@ Create a .env from the .env.example file and fill the variables.
 
 **3. Configure your environment to get access to the Cede SDK**
 
-The Cede Team uses the AWS component CodeArtificat to deliver the private package `@cedelabs-private/sdk`. To get access to it, you have to authenticate to AWS using the **aws cli**. Run the command `aws configure` and provide your Access key ID and Secret Access key.
+The Cede Team uses the AWS component CodeArtifact to deliver the private package `@cedelabs-private/sdk`. To get access to it, you have to authenticate to AWS using the **aws cli**. Run the command `aws configure` and provide your Access key ID and Secret Access key.
 Then, you can connect to CodeArtifact using the following statement: 
 
 ```

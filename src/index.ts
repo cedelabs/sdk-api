@@ -17,9 +17,14 @@ const getCache = () => {
 	});
 }
 
+const clientId = process.env.CLIENT_ID || "";
+if (clientId === "" && env.MODE === "REAL") {
+	throw new Error("CLIENT_ID is required");
+}
+
 sdkApi({
-	mode: "REAL",
-	clientId: process.env.CLIENT_ID || "",
+	mode: env.MODE === "MOCK" ? "MOCK" : "REAL",
+	clientId,
 	cache: getCache(),
 	authentication: env.DEMO === "true" ? () => true :  hmacAuthStrategyMiddleware({
 		secretKey:  process.env.SECRET_API_KEY || "",
