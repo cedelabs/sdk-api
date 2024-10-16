@@ -2,6 +2,7 @@ import { Any, SdkCacheStorage, SDKCacheItem } from "@cedelabs-private/sdk";
 import mongoose, { Schema } from "mongoose";
 import { Types } from "mongoose";
 import sizeof from "object-sizeof";
+import { splitDataToChunks } from "../utils/split";
 
 type MongoSdkCacheItem = SDKCacheItem<Any> & {
 	compoundData?: SDKCacheItem<Any>[];
@@ -29,9 +30,9 @@ export class MongoCacheStorage implements SdkCacheStorage {
 	static async create(
 		config: MongoCacheStorageConfig
 	): Promise<MongoCacheStorage> {
-		const redisCacheStorage = new MongoCacheStorage(config);
-		await redisCacheStorage.connect();
-		return redisCacheStorage;
+		const mongoCacheStorage = new MongoCacheStorage(config);
+		await mongoCacheStorage.connect();
+		return mongoCacheStorage;
 	}
 
 	constructor(private config: MongoCacheStorageConfig) {}
@@ -64,7 +65,7 @@ export class MongoCacheStorage implements SdkCacheStorage {
 		return {
 			key: objectData.key,
 			data: objectData.data,
-			expiry: objectData.expiry,
+			expiry: new Date(objectData.expiry as unknown as string).getTime(),
 		};
 	}
 
@@ -78,7 +79,7 @@ export class MongoCacheStorage implements SdkCacheStorage {
 		const dataSize = sizeof(stringifiedData);
 
 		if (dataSize > SIZE_LIMIT_BY_DOCUMENT) {
-			const dataChunks = this.splitData(stringifiedData);
+			const dataChunks = splitDataToChunks(SIZE_LIMIT_BY_DOCUMENT, stringifiedData);
 			const mainChunk = dataChunks.shift();
 			if (!mainChunk) return;
 
@@ -110,18 +111,10 @@ export class MongoCacheStorage implements SdkCacheStorage {
 	}
 
 	async removeByIncludedStrings(includedStrings: string[]): Promise<string[]> {
-		const deletedKeys: string[] = [];
 		await MongoCacheItem.deleteMany({
-			key: { $regex: `.*${includedStrings.join(".*")}.*` },
+			key: { $regex: `(${includedStrings.join("|")})` },
 		});
-		return deletedKeys;
+		return includedStrings;
 	}
 
-	private splitData(data: string): string[] {
-		const chunks = [];
-		for (let i = 0; i < data.length; i += SIZE_LIMIT_BY_DOCUMENT) {
-			chunks.push(data.slice(i, i + SIZE_LIMIT_BY_DOCUMENT));
-		}
-		return chunks;
-	}
 }
