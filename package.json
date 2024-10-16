@@ -7,11 +7,13 @@
 	"scripts": {
 		"dev": "tsx watch src/index",
 		"build": "npx pkgroll",
-		"start": "node dist/index.js"
+		"start": "node dist/index.js",
+		"test": "vitest"
 	},
 	"dependencies": {
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
+		"mongoose": "^8.7.1",
 		"redis": "^4.7.0",
 		"@cedelabs-private/sdk": "^1.14.0"
 	},
@@ -20,6 +22,7 @@
 		"@types/node": "^22.5.5",
 		"pkgroll": "^2.5.0",
 		"tsx": "^4.19.1",
-		"typescript": "^5.6.2"
+		"typescript": "^5.6.2",
+		"vitest": "^2.1.3"
 	}
 }

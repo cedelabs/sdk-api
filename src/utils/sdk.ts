@@ -6,7 +6,7 @@ export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 		clientId: configuration.clientId,
 		proxyUrl: configuration.proxyUrl,
 		cacheStorage: await configuration.cache,
-		credentialsStorage: await configuration.credentials,
+		credentialsStorage: await configuration.credentials
 	});
 
 	if (configuration.listenerByEvent) {

@@ -5,15 +5,15 @@ import { InMemoryCacheStorage } from "@cedelabs-private/sdk";
 import { env } from "process";
 import { sdkApi } from "./app";
 import { hmacAuthStrategyMiddleware } from "./authentication/hmac.strategy";
-import { RedisCacheStorage } from "./cache/redis.storage";
+import { MongoCacheStorage } from "./cache/mongo.storage";
 
 const getCache = () => {
 	if (process.env.NODE_ENV === "development" || !process.env.REDIS_URL) {
 		console.log("[server]: 🚧 You are using an in-memory cache. Please use Redis cache in production.");
 		return new InMemoryCacheStorage();
 	}
-	return RedisCacheStorage.create({
-		url: process.env.REDIS_URL,
+	return MongoCacheStorage.create({
+		url: process.env.MONGODB_URL || "",
 	});
 }
 

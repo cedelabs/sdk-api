@@ -94,6 +94,7 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
 			const result = await sdk.executeApiMethod(method, body);
 			res.status(200).json(result);
 		} catch (error: Any) {
+			console.error(error)
 			res.status(500).json(processError(error));
 		}
 	});
