@@ -1,6 +1,6 @@
-# SDK Api
+# SDK API
 
-## What is HTTP Cede SDK Api?
+## What is HTTP Cede SDK API?
 
 The HTTP Cede SDK API serves as the HTTP service for the `@cedelabs-private/sdk` package. This API enables seamless integration of the package with external services by exposing a well-defined HTTP interface, facilitating effortless communication and interoperability with other systems.
 
