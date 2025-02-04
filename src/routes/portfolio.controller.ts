@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import { Controller, Get, Header, Query, Route, Tags, Response } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
+import { Controller, Get, Header, Route, Tags, Response } from 'tsoa';
+import CedeSDK from '@cedelabs-private/sdk';
 import { extractAuthFromHeaders } from '../utils/auth';
 import { ErrorResponse } from '../types';
-
+import { errorHandler } from '../middleware/errorHandler';      
 type GetWithdrawableBalancesResponse = ReturnType<CedeSDK['api']['getWithdrawableBalances']>;
 type GetBalancesResponse = ReturnType<CedeSDK['api']['getBalances']>;
 
@@ -30,8 +29,8 @@ export class PortfolioController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getWithdrawableBalances(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -64,8 +63,8 @@ export class PortfolioController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getBalances(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -89,41 +88,31 @@ export function portfolioRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new PortfolioController(sdk);
 
-  router.get('/withdrawable-balances', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getWithdrawableBalances(
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
+  router.get('/withdrawable-balances', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getWithdrawableBalances(
+        auth.exchangeInstanceId,
+        auth.exchangeId,
         auth.apiKey,
         auth.secretKey,
-        auth.password,
-        auth.uid
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+        auth.password as string | undefined,
+        auth.uid as string | undefined
+    );
+    res.json(result);
+  }));
 
-  router.get('/balances', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getBalances(
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        auth.apiKey,
-        auth.secretKey,
+  router.get('/balances', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getBalances(
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
         auth.password,
-        auth.uid
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+      auth.uid
+    );
+    res.json(result);
+  }));
 
   return router;
 } 

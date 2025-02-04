@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { Body, Controller, Get, Header, Path, Post, Query, Route, Tags, Response } from 'tsoa';
+import { Body, Controller, Get, Header, Path, Post, Query, Route, Tags, Response, Queries } from 'tsoa';
 import { processError } from '../utils/error';
 import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
 import { AuthParams } from '../utils/typeUtils';
 import { PrepareWithdrawalParams as OriginalPrepareWithdrawalParams } from '@cedelabs-private/sdk';
 import { CreateWithdrawalParams as OriginalCreateWithdrawalParams } from '@cedelabs-private/sdk';
 import { ErrorResponse } from '../types';
-
+import { errorHandler } from '../middleware/errorHandler';  
+import { extractAuthFromHeaders } from '../utils/auth';
 /**
  * @remarks
  * We can't use generic types to avoid redundant replacements of parameters and adding `auth` to the params.
@@ -26,7 +27,20 @@ type CheckAddressIsWhitelistedResponse = ReturnType<CedeSDK['api']['checkAddress
 type GetWhitelistedAddressesResponse = ReturnType<CedeSDK['api']['getWhitelistedAddresses']>;
 type GetKrakenWithdrawalMethodsResponse = ReturnType<CedeSDK['api']['getKrakenWithdrawalMethods']>;
 type CreateWithdrawalResponse = ReturnType<CedeSDK['api']['createWithdrawal']>;
-
+type GetWithdrawalFeeParams = {
+  tokenSymbol: string;
+  network: string;
+  amount: number;
+}
+type GetWhitelistedAddressesParams = {
+  tokenSymbol?: string;
+  network?: string;
+}
+type CheckAddressIsWhitelistedParams = {
+  address: string;
+  tokenSymbol: string;
+  key: string;
+}
 @Route('withdrawal')
 @Tags('Withdrawal')
 export class WithdrawalController extends Controller {
@@ -52,8 +66,8 @@ export class WithdrawalController extends Controller {
     @Path() withdrawalId: string,
     @Query() tokenSymbol: string,
     @Query() timestamp: number,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -126,17 +140,15 @@ export class WithdrawalController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getWithdrawalFee(
-    @Query() exchangeId: string,
-    @Query() exchangeInstanceId: string,
-    @Query() tokenSymbol: string,
-    @Query() network: string,
-    @Query() amount: number,
+    @Queries() params: GetWithdrawalFeeParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetWithdrawalFeeResponse> {
-    return await this.sdk.api.getWithdrawalFee({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, tokenSymbol, network, amount });
+    return await this.sdk.api.getWithdrawalFee({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
   }
 
   /**
@@ -154,17 +166,15 @@ export class WithdrawalController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async checkAddressIsWhitelisted(
-    @Query() exchangeId: string,
-    @Query() address: string,
-    @Query() tokenSymbol: string,
-    @Query() key: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
+    @Queries() params: CheckAddressIsWhitelistedParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<CheckAddressIsWhitelistedResponse> {
-    return await this.sdk.api.checkAddressIsWhitelisted({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, address, tokenSymbol, key });
+    return await this.sdk.api.checkAddressIsWhitelisted({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
   }
 
   /**
@@ -182,16 +192,15 @@ export class WithdrawalController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getWhitelistedAddresses(
-    @Query() exchangeId: string,
-    @Query() exchangeInstanceId: string,
+    @Queries() params: GetWhitelistedAddressesParams,
+    @Header('x-exchange-id') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
-    @Query() tokenSymbol?: string,
-    @Query() network?: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetWhitelistedAddressesResponse> {
-    return await this.sdk.api.getWhitelistedAddresses({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, tokenSymbol, network });
+    return await this.sdk.api.getWhitelistedAddresses({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
   }
 
   /**
@@ -209,8 +218,8 @@ export class WithdrawalController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getKrakenWithdrawalMethods(
-    @Query() exchangeId: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -225,121 +234,98 @@ export function withdrawalRoutes(sdk: any) {
   const router = Router();
   const controller = new WithdrawalController(sdk);
 
-  router.get('/:withdrawalId', async (req, res) => {
-    try {
-      const result = await controller.getWithdrawalById(
-        req.params.withdrawalId,
-        req.query.tokenSymbol as string,
-        Number(req.query.timestamp),
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
+  router.get('/:withdrawalId', errorHandler(async (req, res) => {
+    const result = await controller.getWithdrawalById(
+      req.params.withdrawalId,
+      req.query.tokenSymbol as string,
+      Number(req.query.timestamp),
+      req.query.exchangeInstanceId as string,
+      req.query.exchangeId as string,
         req.header('x-exchange-api-key') as string,
         req.header('x-exchange-api-secret') as string,
         req.header('x-exchange-api-password') as string,
         req.header('x-exchange-api-uid') as string
       );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+    res.json(result);
+  }));
 
-  router.post('/', async (req, res) => {
-    try {
-      const result = await controller.createWithdrawal(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/', errorHandler(async (req, res) => {
+    const result = await controller.createWithdrawal(req.body);
+    res.json(result);
+  }));
 
-  router.post('/prepare', async (req, res) => {
-    try {
-      const result = await controller.prepareWithdrawal(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/prepare', errorHandler(async (req, res) => {
+    const result = await controller.prepareWithdrawal(req.body);
+    res.json(result);
+  }));
 
-  router.get('/fee', async (req, res) => {
-    try {
-      const result = await controller.getWithdrawalFee(
-        req.query.exchangeId as string,
-        req.query.exchangeInstanceId as string,
-        req.query.tokenSymbol as string,
-        req.query.network as string,
-        Number(req.query.amount),
-        req.header('x-exchange-api-key') as string,
-        req.header('x-exchange-api-secret') as string,
-        req.header('x-exchange-api-password') as string,
-        req.header('x-exchange-api-uid') as string,
+
+  router.get('/fee', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getWithdrawalFee(
+        {
+          tokenSymbol: req.query.tokenSymbol as string,
+          network: req.query.network as string,
+          amount: Number(req.query.amount),
+        },
+        auth.exchangeInstanceId,
+        auth.exchangeId,
+        auth.apiKey,
+        auth.secretKey,
+        auth.password,
+        auth.uid,
       );
       res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  }));
 
-  router.get('/whitelisted-addresses/check', async (req, res) => {
-    try {
-      const result = await controller.checkAddressIsWhitelisted(
-        req.query.exchangeId as string,
-        req.query.address as string,
-        req.query.tokenSymbol as string,
-        req.query.key as string,
-        req.query.exchangeInstanceId as string,
-        req.header('x-exchange-api-key') as string,
-        req.header('x-exchange-api-secret') as string,
-        req.header('x-exchange-api-password') as string,
-        req.header('x-exchange-api-uid') as string,
+
+  router.get('/whitelisted-addresses/check', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.checkAddressIsWhitelisted(
+      {
+        address: req.query.address as string,
+        tokenSymbol: req.query.tokenSymbol as string,
+        key: req.query.key as string,
+      },
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
+  }));
+
+  router.get('/whitelisted-addresses', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getWhitelistedAddresses(
+        {
+          tokenSymbol: req.query.tokenSymbol as string,
+          network: req.query.network as string,
+        },
+        auth.exchangeId,
+        auth.exchangeInstanceId,
+        auth.apiKey,
+        auth.secretKey,
+        auth.password,
+        auth.uid,
       );
       res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  }));
 
-  router.get('/whitelisted-addresses', async (req, res) => {
-    try {
-      const result = await controller.getWhitelistedAddresses(
-        req.query.exchangeId as string,
-        req.query.exchangeInstanceId as string,
-        req.header('x-exchange-api-key') as string,
-        req.header('x-exchange-api-secret') as string,
-        req.query.tokenSymbol as string,
-        req.query.network as string,
-        req.header('x-exchange-api-password') as string,
-        req.header('x-exchange-api-uid') as string,
+  router.get('/kraken-methods', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getKrakenWithdrawalMethods(
+        auth.exchangeId,
+        auth.exchangeInstanceId,
+        auth.apiKey,
+        auth.secretKey,
+        auth.password,
+        auth.uid,
       );
       res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
-
-  router.get('/kraken-methods', async (req, res) => {
-    try {
-      const result = await controller.getKrakenWithdrawalMethods(
-        req.query.exchangeId as string,
-        req.query.exchangeInstanceId as string,
-        req.header('x-exchange-api-key') as string,
-        req.header('x-exchange-api-secret') as string,
-        req.header('x-exchange-api-password') as string,
-        req.header('x-exchange-api-uid') as string,
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  }));
 
   return router;
 } 

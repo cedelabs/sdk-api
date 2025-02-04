@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { Controller, Get, Query, Route, Tags } from 'tsoa';
 import { processError } from '../utils/error';
 import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
-
+import { errorHandler } from '../middleware/errorHandler';
 type GetPricesResponse = ReturnType<CedeSDK['api']['getPrices']>;
 type GetFiatCurrenciesResponse = ReturnType<CedeSDK['api']['getFiatCurrencies']>;
 
@@ -42,27 +42,17 @@ export function pricesRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new PricesController(sdk);
 
-  router.get('/', async (req, res) => {
-    try {
-      const result = await controller.getPrices(
-        req.query.exchangeId as string || undefined
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/', errorHandler(async (req, res) => {
+    const result = await controller.getPrices(
+      req.query.exchangeId as string || undefined
+    );
+    res.json(result);
+  }));
 
-  router.get('/fiat-currencies', async (req, res) => {
-    try {
-      const result = await controller.getFiatCurrencies();
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/fiat-currencies', errorHandler(async (req, res) => {
+    const result = await controller.getFiatCurrencies();
+    res.json(result);
+  }));
 
   return router;
 } 

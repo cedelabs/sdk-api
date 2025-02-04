@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Body, Controller, Delete, Get, Header, Path, Post, Put, Query, Route, Tags, Response } from 'tsoa';
+import { Body, Controller, Delete, Get, Header, Path, Post, Put, Query, Route, Tags, Response, Queries } from 'tsoa';
 import {processError } from '../utils/error';
 import CedeSDK, { CedeSDKError, 
   CreateOrderParams as CreateOrderParamsType, 
@@ -10,6 +10,7 @@ import CedeSDK, { CedeSDKError,
 import { AuthParams } from '../utils/typeUtils';
 import { extractAuthFromHeaders } from '../utils/auth';
 import { ErrorResponse } from '../types';
+import { errorHandler } from '../middleware/errorHandler';
 
 type PrepareOrderParams = Omit<PrepareOrderParamsType, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'exchange'> & {
   auth: AuthParams;
@@ -31,9 +32,19 @@ type GetOrderResponse = ReturnType<CedeSDK['api']['getOrder']>;
 type GetOpenOrdersResponse = ReturnType<CedeSDK['api']['getOpenOrders']>;
 type GetMinAmountsResponse = ReturnType<CedeSDK['api']['getMinAmounts']>;
 type CancelOrderResponse = ReturnType<CedeSDK['api']['cancelOrder']>;
+type GetOpenOrdersParams = {
+  pairSymbol: string;
+  since?: number;
+  limit?: number;
+}
+type GetMinAmountsParams = {
+  pairSymbol: string;
+  orderSide: "buy" | "sell";
+  price: string;
+}
 
 @Route('trade')
-@Tags('Trading')
+@Tags('Trade')
 export class TradeController extends Controller {
   constructor(private sdk: CedeSDK) {
     super();
@@ -54,8 +65,8 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getMarketPairs(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -88,8 +99,8 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getMarketRate(
     @Query() pairSymbol: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -113,17 +124,15 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getMinAmounts(
-    @Query() pairSymbol: string,
-    @Query() orderSide: "buy" | "sell",
-    @Query() price: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Queries() params: GetMinAmountsParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetMinAmountsResponse> {
-    return await this.sdk.api.getMinAmounts({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, pairSymbol, orderSide, price });
+    return await this.sdk.api.getMinAmounts({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
   }
 
   /**
@@ -178,8 +187,8 @@ export class TradeController extends Controller {
   public async getOrder(
     @Path() orderId: string,
     @Query() pairSymbol: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -225,9 +234,9 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async cancelOrder(
     @Path() orderId: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
-    @Query('pairSymbol') pairSymbol: string,
+    @Query() pairSymbol: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -251,21 +260,18 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getOpenOrders(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
-    @Query('pairSymbol') pairSymbol: string,
+    @Queries() params: GetOpenOrdersParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
-    @Query('since') since?: number,
-    @Query('limit') limit?: number,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetOpenOrdersResponse> {
-    return await this.sdk.api.getOpenOrders({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, pairSymbol, since, limit });
+    return await this.sdk.api.getOpenOrders({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
   }
 }
 
-// Express router wrapper
 export function tradeRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new TradeController(sdk);
@@ -287,9 +293,8 @@ export function tradeRoutes(sdk: CedeSDK) {
   });
 
 
-  router.get('/market-rate', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
+  router.get('/market-rate', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
       const result = await controller.getMarketRate( 
         req.query.pairSymbol as string,
         req.query.exchangeInstanceId as string, 
@@ -300,123 +305,88 @@ export function tradeRoutes(sdk: CedeSDK) {
         auth.uid,
       );
       res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError );
-      res.status(status).json(errorResponse);
-    }
-  });
+  }));
 
-  router.get('/min-amounts', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
+  router.get('/min-amounts', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
       const result = await controller.getMinAmounts(
-        req.query.pairSymbol as string,
-        req.query.orderSide as "buy" | "sell",
-        req.query.price as string,
-        req.query.exchangeInstanceId as string, 
-        req.query.exchangeId as string,
+        {
+          pairSymbol: req.query.pairSymbol as string,
+          orderSide: req.query.orderSide as "buy" | "sell",
+          price: req.query.price as string,
+        },
+        auth.exchangeInstanceId,
+        auth.exchangeId,
         auth.apiKey,
         auth.secretKey,
         auth.password,
         auth.uid,
       );
       res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError );
-      res.status(status).json(errorResponse);
-    }
-  });
+  }));
 
-  router.post('/orders/prepare', async (req, res) => {
-    try {
-      const result = await controller.prepareOrder(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/orders/prepare', errorHandler(async (req, res) => {
+    const result = await controller.prepareOrder(req.body);
+    res.json(result);
+  }));
 
-  router.post('/orders', async (req, res) => {
-    try {
-      const result = await controller.createOrder(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/orders', errorHandler(async (req, res) => {
+    const result = await controller.createOrder(req.body);
+    res.json(result);
+  }));
 
-  router.get('/orders/:id', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getOrder(
-        req.params.id,
-        req.query.pairSymbol as string,
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/orders/:id', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getOrder(
+      req.params.id,
+      req.query.pairSymbol as string,
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
+  }));
 
-  router.put('/orders/:orderId', async (req, res) => {
-    try {
-      const result = await controller.updateOrder(req.params.orderId, req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.put('/orders/:orderId', errorHandler(async (req, res) => {
+    const result = await controller.updateOrder(req.params.orderId, req.body);
+    res.json(result);
+  }));
 
-  router.delete('/orders/:id', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.cancelOrder(
-        req.params.id,
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        req.query.pairSymbol as string,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.delete('/orders/:id', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.cancelOrder(
+      req.params.id,
+      req.query.pairSymbol as string,
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
+  }));
 
-  router.get('/orders', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getOpenOrders(
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        req.query.pairSymbol as string,
-        auth.apiKey,
-        auth.secretKey,
-        req.query.since as number | undefined,
-        req.query.limit as number | undefined,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/orders', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getOpenOrders(
+      {
+        pairSymbol: req.query.pairSymbol as string,
+        since: req.query.since as number | undefined,
+        limit: req.query.limit as number | undefined,
+      },
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
+  }));
 
   return router;
 }

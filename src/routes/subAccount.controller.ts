@@ -5,6 +5,7 @@ import CedeSDK, { CedeSDKError, SubAccountTransferResponse, SubAccountTransferPa
 import { AuthParams } from '../utils/typeUtils';
 import { extractAuthFromHeaders } from '../utils/auth';
 import { ErrorResponse } from '../types';
+import { errorHandler } from '../middleware/errorHandler';
 
 type GetSubAccountsResponse = ReturnType<CedeSDK['api']['getSubAccounts']>;
 type GetSubAccountBalancesResponse = ReturnType<CedeSDK['api']['getSubAccountBalances']>;
@@ -33,8 +34,8 @@ export class SubAccountController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getSubAccounts(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -68,8 +69,8 @@ export class SubAccountController extends Controller {
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getSubAccountBalances(
     @Query() uid: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -102,54 +103,38 @@ export function subAccountRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new SubAccountController(sdk);
 
-  router.get('/', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getSubAccounts(
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getSubAccounts(
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey
+    );
+    res.json(result);
+  }));
 
-  router.get('/balances', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const uid = req.query.uid as string;
-      const decodedUid = decodeURIComponent(uid);
-      const result = await controller.getSubAccountBalances(
+  router.get('/balances', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const uid = req.query.uid as string;
+    const decodedUid = decodeURIComponent(uid);
+    const result = await controller.getSubAccountBalances(
         decodedUid,
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
+        auth.exchangeInstanceId,
+        auth.exchangeId,
         auth.apiKey,
         auth.secretKey,
         auth.password,
-        auth.uid,
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+      auth.uid,
+    );
+    res.json(result);
+  }));
 
-  router.post('/transfer', async (req, res) => {
-    try {
-      const result = await controller.subAccountTransfer(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/transfer', errorHandler(async (req, res) => {
+    const result = await controller.subAccountTransfer(req.body);
+    res.json(result);
+  }));
+
 
   return router;
 } 

@@ -1,12 +1,13 @@
 import { Request } from 'express';
 import { AuthParams } from './typeUtils';
-
 /**
  * Extracts authentication parameters from request headers
  * Headers are expected to be prefixed with 'x-'
  */
-export function extractAuthFromHeaders(req: Request): Omit<AuthParams, 'exchangeId'> {
-  const auth: Omit<AuthParams, 'exchangeId'> = {
+export function extractAuthFromHeaders(req: Request): AuthParams {
+  const auth: AuthParams = {
+    exchangeInstanceId: req.headers['x-exchange-instance-id'] as string,
+    exchangeId: req.headers['x-exchange-id'] as string,
     apiKey: req.headers['x-exchange-api-key'] as string,
     secretKey: req.headers['x-exchange-api-secret'] as string,
   };

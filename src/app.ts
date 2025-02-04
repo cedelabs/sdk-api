@@ -11,7 +11,7 @@ const __dirname = path.resolve();
 export async function sdkApi(configuration: SdkApiConfiguration) {
   const sdk = await setupCedeSdk(configuration);
   const app: Express = express();
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3222;
   app.use(bodyParser.json());
   app.use(
 	OpenApiValidator.middleware({
@@ -55,12 +55,6 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   }
 
   app.use('/api/v1', setupRoutes(sdk));
-
-  // Error handling middleware
-  app.use((err: any, req: any, res: any, next: any) => {
-    const { status, error } = processError(err);
-    res.status(status).json({ error });
-  });
 
   app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

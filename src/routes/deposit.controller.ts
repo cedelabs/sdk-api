@@ -1,14 +1,24 @@
 import { Router } from 'express';
-import { Body, Controller, Get, Header, Post, Query, Route, Tags, Response } from 'tsoa';
-import {  processError } from '../utils/error';
-import CedeSDK, { CedeSDKError, GetDepositableTokenParams as GetDepositableTokenParamsType, PureTransaction } from '@cedelabs-private/sdk';
+import { Body, Controller, Get, Header, Post, Query, Route, Tags, Response, Queries } from 'tsoa';
+import CedeSDK, { PureTransaction } from '@cedelabs-private/sdk';
 import { extractAuthFromHeaders } from '../utils/auth';
 import { OnDepositParams } from '../types/types';
 import { ErrorResponse } from '../types';
+import { errorHandler } from '../middleware/errorHandler';
 
 type GetDepositAddressResponse = ReturnType<CedeSDK['api']['getDepositAddress']>;
 type RetrieveDepositResponse = ReturnType<CedeSDK['api']['retrieveDeposit']>;
 type GetDepositableTokensResponse = ReturnType<CedeSDK['api']['getDepositableTokens']>;
+
+type GetDepositAddressParams = {
+  tokenSymbol: string;
+  network: string;
+}
+
+type RetrieveDepositParams = {
+  txHash: string;
+  tokenSymbol: string;
+}
 
 @Route('deposit')
 @Tags('Deposit')
@@ -31,10 +41,9 @@ export class DepositController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getDepositAddress(
-    @Query() tokenSymbol: string,
-    @Query() network: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Queries() params: GetDepositAddressParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -49,8 +58,7 @@ export class DepositController extends Controller {
         password,
         uid,
       },
-      tokenSymbol,
-      network,
+      ...params,
     });
   }
 
@@ -67,16 +75,19 @@ export class DepositController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async retrieveDeposit(
-    @Query() txHash: string,
-    @Query() tokenSymbol: string,
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Queries() params: RetrieveDepositParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<RetrieveDepositResponse> {
-    return await this.sdk.api.retrieveDeposit({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, txHash, tokenSymbol });
+    return await this.sdk.api.retrieveDeposit({ 
+      exchangeInstanceId, 
+      auth: { exchangeId, apiKey, secretKey, password, uid }, 
+      ...params 
+    });
   }
 
   /**
@@ -145,8 +156,8 @@ export class DepositController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getDepositableTokens(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
@@ -161,63 +172,59 @@ export function depositRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new DepositController(sdk);
 
-  router.get('/address', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getDepositAddress(
-        req.query.tokenSymbol as string,  
-        req.query.network as string,
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password as string | undefined,
-        auth.uid as string | undefined
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/address', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const params: GetDepositAddressParams = {
+      tokenSymbol: req.query.tokenSymbol as string,
+      network: req.query.network as string
+    };
+    const result = await controller.getDepositAddress(
+      params,
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid
+    );
+    res.json(result);
+  }));
 
-  router.get('/retrieve', async (req, res) => {
-    try {
-      const result = await controller.retrieveDeposit(req.query.exchangeInstanceId as string, req.query.exchangeId as string, req.query.apiKey as string, req.query.secretKey as string, req.query.password as string, req.query.uid as string, req.query.txHash as string, req.query.tokenSymbol as string);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/retrieve', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const params: RetrieveDepositParams = {
+      txHash: req.query.txHash as string,
+      tokenSymbol: req.query.tokenSymbol as string
+    };
+    const result = await controller.retrieveDeposit(
+      params,
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid
+    );
+    res.json(result);
+  }));
 
-  router.post('/on-deposit', async (req, res) => {
-    try {
-      const result = await controller.onDeposit(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/on-deposit', errorHandler(async (req, res) => {
+    const result = await controller.onDeposit(req.body);
+    res.json(result);
+  }));
 
-  router.get('/tokens', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getDepositableTokens(
-        req.query.exchangeInstanceId as string, 
-        req.query.exchangeId as string, 
-        auth.apiKey, 
-        auth.secretKey, 
-        auth.password, 
-        auth.uid
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/tokens', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getDepositableTokens(
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid
+    );
+    res.json(result);
+  }));
 
   return router;
 } 

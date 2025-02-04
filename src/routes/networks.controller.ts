@@ -1,14 +1,18 @@
 import { Router } from 'express';
-import { Controller, Get, Header, Path, Query, Route, Tags, Response } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
+import { Controller, Get, Header, Path, Query, Route, Tags, Response, Queries } from 'tsoa';
+import CedeSDK from '@cedelabs-private/sdk';
 import { extractAuthFromHeaders } from '../utils/auth';
 import { ErrorResponse } from '../types';
+import { errorHandler } from '../middleware/errorHandler';
 
 
 type GetNetworksResponse = ReturnType<CedeSDK['api']['getNetworks']>;
 type GetAvailableNetworksResponse = ReturnType<CedeSDK['api']['getAvailableNetworks']>;
-
+type GetNetworksParams = {
+  tokenSymbol?: string;
+  toDeposit?: boolean;
+  toWithdraw?: boolean;
+}
 @Route('networks')
 @Tags('Networks')
 export class NetworksController extends Controller {
@@ -31,15 +35,13 @@ export class NetworksController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getNetworks(
-    @Query('exchangeInstanceId') exchangeInstanceId: string,
-    @Query('exchangeId') exchangeId: string,
+    @Queries() params: GetNetworksParams,
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
     @Header('x-exchange-api-key') apiKey: string,
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
-    @Query() tokenSymbol?: string,
-    @Query() toDeposit?: boolean,
-    @Query() toWithdraw?: boolean,
   ): Promise<GetNetworksResponse> {
     return await this.sdk.api.getNetworks({
       exchangeInstanceId,
@@ -50,8 +52,8 @@ export class NetworksController extends Controller {
         password,
         uid,
       },
-      tokenSymbol,
-      opts: { toDeposit, toWithdraw, isInternalTransfer: false },
+      tokenSymbol: params.tokenSymbol,
+      opts: { toDeposit: params.toDeposit, toWithdraw: params.toWithdraw, isInternalTransfer: false },
     });
   }
 
@@ -71,40 +73,33 @@ export function networksRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new NetworksController(sdk);
 
-  router.get('/', async (req, res) => {
-    try {
-      const auth = extractAuthFromHeaders(req);
-      const result = await controller.getNetworks(
-        req.query.exchangeInstanceId as string,
-        req.query.exchangeId as string,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-        req.query.tokenSymbol as string,
-        Boolean(req.query.toDeposit),
-        Boolean(req.query.toWithdraw),
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
+  router.get('/', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const params: GetNetworksParams = {
+      tokenSymbol: req.query.tokenSymbol as string,
+      toDeposit: Boolean(req.query.toDeposit),
+      toWithdraw: Boolean(req.query.toWithdraw),
     }
-  });
+    const result = await controller.getNetworks(
+      params,
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
+  }));
 
-  router.get('/available', async (req, res) => {
-    try {
-      const result = await controller.getAvailableNetworks(
-        req.query.exchangeId as string,
+  router.get('/available', errorHandler(async (req, res) => {
+    const result = await controller.getAvailableNetworks(
+      req.query.exchangeId as string,
         Boolean(req.query.toDeposit),
         Boolean(req.query.toWithdraw),
       );
       res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError );
-      res.status(status).json(errorResponse);
-    }
-  });
+  }));
 
   return router;
 } 

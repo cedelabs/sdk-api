@@ -1,31 +1,26 @@
 import { Router } from 'express';
-import { Body, Controller, Get, Post, Query, Route, Tags, Response } from 'tsoa';
+import { Body, Controller, Get, Post, Route, Tags, Response, Queries, Header } from 'tsoa';
 import { processError } from '../utils/error';
 import CedeSDK, { CedeSDKError, GetOAuthTokensParams, OAuthClientCredentialsParams, ApiPermissions, ApiKey } from '@cedelabs-private/sdk';
 import { ErrorResponse } from '../types';
+import { errorHandler } from '../middleware/errorHandler';
+
+type GetOAuthUrlParams = {
+  redirectUri: string;
+  permissions: ApiPermissions[];
+  deviceId?: string;
+}
+
+type GetFastApiKeysParams = {
+  accessToken: string;
+  permissions?: ApiPermissions[];
+}
 
 @Route('auth')
 @Tags('Authentication')
 export class AuthenticationController extends Controller {
   constructor(private sdk: CedeSDK) {
     super();
-  }
-
-  /**
-   * Check OAuth permissions for an exchange.
-   * Verifies if the OAuth token has the required permissions.
-   */
-  @Get('oauth/permissions')
-  @Response<ErrorResponse>(401, 'Unauthorized')
-  @Response<ErrorResponse>(403, 'Forbidden')
-  @Response<ErrorResponse>(400, 'Bad Request')
-  @Response<ErrorResponse>(404, 'Not Found')
-  @Response<ErrorResponse>(408, 'Request Timeout')
-  @Response<ErrorResponse>(429, 'Too Many Requests')
-  @Response<ErrorResponse>(500, 'Internal Server Error')
-  @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async checkOAuthPermissions(@Query() exchangeInstanceId: string, @Query() permissions: ApiPermissions[]): Promise<ReturnType<CedeSDK['api']['checkOAuthPermissions']>> {
-    return await this.sdk.api.checkOAuthPermissions({ exchangeInstanceId, permissions });
   }
 
   /**
@@ -39,12 +34,13 @@ export class AuthenticationController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getOAuthUrl(
-    @Query() exchangeId: string,
-    @Query() redirectUri: string,
-    @Query() permissions: ApiPermissions[],
-    @Query() deviceId?: string,
+    @Queries() params: GetOAuthUrlParams,
+    @Header('x-exchange-id') exchangeId: string,
   ): Promise<ReturnType<CedeSDK['api']['getOAuthUrl']>> {
-    return await this.sdk.api.getOAuthUrl({ exchangeId, redirectUri, permissions, deviceId });
+    return await this.sdk.api.getOAuthUrl({ 
+      exchangeId, 
+      ...params 
+    });
   }
 
   /**
@@ -76,8 +72,11 @@ export class AuthenticationController extends Controller {
   @Response<ErrorResponse>(429, 'Too Many Requests')
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async checkOAuthAndRefresh(@Body() params: { exchangeInstanceId: string; exchangeId: string }): Promise<void> {
-    return await this.sdk.api.checkOAuthAndRefresh(params);
+  public async checkOAuthAndRefresh(@Body() params: { exchangeInstanceId: string; exchangeId: string }): Promise<{
+    message: string;
+  }> {
+    await this.sdk.api.checkOAuthAndRefresh(params);
+    return { message: 'OAuth check and refresh completed successfully' };
   }
 
   /**
@@ -92,8 +91,11 @@ export class AuthenticationController extends Controller {
   @Response<ErrorResponse>(429, 'Too Many Requests')
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async revokeOAuth(@Body() params: { exchangeInstanceId: string; exchangeId: string }): Promise<void> {
-    return await this.sdk.api.revokeOAuth(params);
+  public async revokeOAuth(@Body() params: { exchangeInstanceId: string; exchangeId: string }): Promise<{
+    message: string;
+  }> {
+    await this.sdk.api.revokeOAuth(params);
+    return { message: 'OAuth access revoked successfully' };
   }
 
   /**
@@ -126,11 +128,13 @@ export class AuthenticationController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async getFastApiKeys(
-    @Query() exchangeId: string,
-    @Query() accessToken: string,
-    @Query() permissions?: ApiPermissions[]
+    @Queries() params: GetFastApiKeysParams,
+    @Header('x-exchange-id') exchangeId: string,
   ): Promise<ApiKey> {
-    return await this.sdk.api.getFastApiKeys({ exchangeId, accessToken, permissions });
+    return await this.sdk.api.getFastApiKeys({ 
+      exchangeId, 
+      ...params 
+    });
   }
 
   /**
@@ -145,8 +149,11 @@ export class AuthenticationController extends Controller {
   @Response<ErrorResponse>(429, 'Too Many Requests')
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async setupOAuthClientCredentials(@Body() params: OAuthClientCredentialsParams): Promise<void> {
-    return await this.sdk.api.setupOAuthClientCredentials(params);
+  public async setupOAuthClientCredentials(@Body() params: OAuthClientCredentialsParams): Promise<{
+    message: string;
+  }> {
+    await this.sdk.api.setupOAuthClientCredentials(params);
+    return { message: 'OAuth client credentials set up successfully' };
   }
 
   /**
@@ -175,38 +182,22 @@ export class AuthenticationController extends Controller {
   }
 }
 
-// Express router wrapper
-export function authenticationRoutes(sdk: any) {
+export function authenticationRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new AuthenticationController(sdk);
 
-  router.get('/oauth/permissions', async (req, res) => {
-    try {
-      const result = await controller.checkOAuthPermissions(
-        req.query.exchangeId as string,
-        req.query.permissions as ApiPermissions[]
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
-
-  router.get('/oauth/url', async (req, res) => {
-    try {
-      const result = await controller.getOAuthUrl(
-        req.query.exchangeId as string,
-        req.query.redirectUri as string,
-        req.query.permissions as ApiPermissions[],
-        req.query.deviceId as string
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/oauth/url', errorHandler(async (req, res) => {
+    const params: GetOAuthUrlParams = {
+      redirectUri: req.query.redirectUri as string,
+      permissions: req.query.permissions as ApiPermissions[],
+      deviceId: req.query.deviceId as string
+    };
+    const result = await controller.getOAuthUrl(
+      params,
+      req.headers['x-exchange-id'] as string
+    );
+    res.json(result);
+  }));
 
   router.post('/oauth/tokens', async (req, res) => {
     try {
@@ -223,72 +214,43 @@ export function authenticationRoutes(sdk: any) {
     }
   });
 
-  router.post('/oauth/check-and-refresh', async (req, res) => {
-    try {
-      await controller.checkOAuthAndRefresh(req.body);
-      res.json({ message: 'OAuth check and refresh completed successfully' });
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/oauth/check-and-refresh', errorHandler(async (req, res) => {
+    const result = await controller.checkOAuthAndRefresh(req.body);
+    res.json(result);
+  }));
 
-  router.post('/oauth/revoke', async (req, res) => {
-    try {
-      await controller.revokeOAuth(req.body);
-      res.json({ message: 'OAuth access revoked successfully' });
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
 
-  router.post('/oauth/refresh', async (req, res) => {
-    try {
-      const result = await controller.refreshToken(req.body);
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/oauth/revoke', errorHandler(async (req, res) => {
+    const result = await controller.revokeOAuth(req.body);
+    res.json(result);
+  }));
 
-  router.get('/fast-api-keys', async (req, res) => {
-    try {
-      const result = await controller.getFastApiKeys(
-        req.query.exchangeId as string,
-        req.query.accessToken as string,
-        req.query.permissions as ApiPermissions[]
-      );
-      res.json(result);
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/oauth/refresh', errorHandler(async (req, res) => {
+    const result = await controller.refreshToken(req.body);
+    res.json(result);
+  }));
 
-  router.post('/oauth/client-credentials', async (req, res) => {
-    try {
-      await controller.setupOAuthClientCredentials(req.body);
-      res.json({ message: 'OAuth client credentials set up successfully' });
-    } catch (error) {
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.get('/fast-api-keys', errorHandler(async (req, res) => {
+    const params: GetFastApiKeysParams = {
+      accessToken: req.query.accessToken as string,
+      permissions: req.query.permissions as ApiPermissions[]
+    };
+    const result = await controller.getFastApiKeys(
+      params,
+      req.headers['x-exchange-id'] as string
+    );
+    res.json(result);
+  }));
 
-  router.post('/check-credentials', async (req, res) => {
-    try {
-      console.log("REQ", req.body);
-      const result = await controller.checkCredentials(req.body);
-      console.log("RESULT", result);
-      res.json(result);
-    } catch (error) {
-      console.log("ERROR", error);
-      const { status, error: errorResponse } = processError(error as CedeSDKError);
-      res.status(status).json(errorResponse);
-    }
-  });
+  router.post('/oauth/client-credentials', errorHandler(async (req, res) => {
+    const result = await controller.setupOAuthClientCredentials(req.body);
+    res.json(result);
+  }));
+
+  router.post('/check-credentials', errorHandler(async (req, res) => {
+    const result = await controller.checkCredentials(req.body);
+    res.json(result);
+  }));
 
   return router;
 } 
