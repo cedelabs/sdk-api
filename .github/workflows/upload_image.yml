@@ -1,0 +1,70 @@
+name: SDK API
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Github Commit Hash"
+        required: true
+        type: string
+      sdk_version:
+        description: "SDK Version (e.g. 2.9.0)"
+        required: true
+        type: string
+
+env:
+  GCP_ACR_REGISTRY: ${{ vars.GCP_ACR_REGISTRY }}
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GCP_ACR_REPOSITORY: ${{ vars.GCP_ACR_REPOSITORY }}
+  GCP_ACR_IMAGE_NAME: ${{ vars.GCP_ACR_IMAGE_NAME }}-sdk_v${{ github.event.inputs.sdk_version }}
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.sha || github.sha }}
+
+      - name: Configure GCP credentials
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+      
+      - name: Login to GCP Artifact registry
+        run: gcloud auth configure-docker ${{ env.GCP_ACR_REGISTRY }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Retrieve Docker layers from cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/buildx-cache
+          key: ${{ runner.os }}-buildx-cache
+
+      - name: Build, tag, and push image to GCP ACR
+        uses: docker/build-push-action@v6
+        id: build-acr-docker-image
+        with:
+          context: ./
+          push: true
+          file: ./Dockerfile
+          tags: |
+            ${{ env.GCP_ACR_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ACR_REPOSITORY }}/${{ env.GCP_ACR_IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.GCP_ACR_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ACR_REPOSITORY }}/${{ env.GCP_ACR_IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+          platforms: linux/amd64
