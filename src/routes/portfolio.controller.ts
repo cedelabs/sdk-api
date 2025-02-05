@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { Controller, Get, Header, Route, Tags, Response } from 'tsoa';
 import CedeSDK from '@cedelabs-private/sdk';
-import { extractAuthFromHeaders } from '../utils/auth';
+import { Router } from 'express';
+import { Controller, Get, Header, Response, Route, Tags } from 'tsoa';
+import { errorHandler } from '../middleware/errorHandler';
 import { ErrorResponse } from '../types';
-import { errorHandler } from '../middleware/errorHandler';      
+import { extractAuthFromHeaders } from '../utils/auth';
 type GetWithdrawableBalancesResponse = ReturnType<CedeSDK['api']['getWithdrawableBalances']>;
 type GetBalancesResponse = ReturnType<CedeSDK['api']['getBalances']>;
 
@@ -83,7 +83,6 @@ export class PortfolioController extends Controller {
   }
 }
 
-// Express router wrapper
 export function portfolioRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new PortfolioController(sdk);
@@ -111,6 +110,7 @@ export function portfolioRoutes(sdk: CedeSDK) {
         auth.password,
       auth.uid
     );
+    console.log("balances", result);
     res.json(result);
   }));
 

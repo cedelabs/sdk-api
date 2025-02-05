@@ -38,12 +38,12 @@ aws codeartifact login --tool npm --repository cedelabs-private --domain cedelab
 
 **4. Install the dependencies**
 ```
-yarn install
+pnpm i
 ```
 
 **5. Start the server in dev mode**
 ```
-yarn dev
+pnpm dev
 ```
 
 or using docker
@@ -134,13 +134,13 @@ This project uses TSOA to automatically generate OpenAPI 3.0 documentation from 
 
 1. Generate the OpenAPI specification and routes:
 ```bash
-yarn tsoa spec
-yarn tsoa routes
+pnpm tsoa spec
+pnpm tsoa routes
 ```
 
 2. Build the project:
 ```bash
-yarn build
+pnpm build
 ```
 
 This provides clear instructions for generating and using the API documentation while highlighting the important steps for setting up Postman correctly.

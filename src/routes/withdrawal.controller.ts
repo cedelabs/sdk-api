@@ -1,13 +1,10 @@
+import CedeSDK, { CreateWithdrawalParams as OriginalCreateWithdrawalParams, PrepareWithdrawalParams as OriginalPrepareWithdrawalParams } from '@cedelabs-private/sdk';
 import { Router } from 'express';
-import { Body, Controller, Get, Header, Path, Post, Query, Route, Tags, Response, Queries } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
-import { AuthParams } from '../utils/typeUtils';
-import { PrepareWithdrawalParams as OriginalPrepareWithdrawalParams } from '@cedelabs-private/sdk';
-import { CreateWithdrawalParams as OriginalCreateWithdrawalParams } from '@cedelabs-private/sdk';
+import { Body, Controller, Get, Header, Path, Post, Queries, Query, Response, Route, Tags } from 'tsoa';
+import { errorHandler } from '../middleware/errorHandler';
 import { ErrorResponse } from '../types';
-import { errorHandler } from '../middleware/errorHandler';  
 import { extractAuthFromHeaders } from '../utils/auth';
+import { AuthParams } from '../utils/typeUtils';
 /**
  * @remarks
  * We can't use generic types to avoid redundant replacements of parameters and adding `auth` to the params.
@@ -27,16 +24,16 @@ type CheckAddressIsWhitelistedResponse = ReturnType<CedeSDK['api']['checkAddress
 type GetWhitelistedAddressesResponse = ReturnType<CedeSDK['api']['getWhitelistedAddresses']>;
 type GetKrakenWithdrawalMethodsResponse = ReturnType<CedeSDK['api']['getKrakenWithdrawalMethods']>;
 type CreateWithdrawalResponse = ReturnType<CedeSDK['api']['createWithdrawal']>;
-type GetWithdrawalFeeParams = {
+interface GetWithdrawalFeeParams {
   tokenSymbol: string;
   network: string;
   amount: number;
 }
-type GetWhitelistedAddressesParams = {
+interface GetWhitelistedAddressesParams {
   tokenSymbol?: string;
   network?: string;
 }
-type CheckAddressIsWhitelistedParams = {
+interface CheckAddressIsWhitelistedParams {
   address: string;
   tokenSymbol: string;
   key: string;
@@ -229,7 +226,6 @@ export class WithdrawalController extends Controller {
   }
 }
 
-// Express router wrapper
 export function withdrawalRoutes(sdk: any) {
   const router = Router();
   const controller = new WithdrawalController(sdk);

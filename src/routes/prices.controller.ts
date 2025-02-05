@@ -1,7 +1,6 @@
+import CedeSDK from '@cedelabs-private/sdk';
 import { Router } from 'express';
 import { Controller, Get, Query, Route, Tags } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
 import { errorHandler } from '../middleware/errorHandler';
 type GetPricesResponse = ReturnType<CedeSDK['api']['getPrices']>;
 type GetFiatCurrenciesResponse = ReturnType<CedeSDK['api']['getFiatCurrencies']>;

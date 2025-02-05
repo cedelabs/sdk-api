@@ -1,10 +1,9 @@
+import CedeSDK from '@cedelabs-private/sdk';
 import { Router } from 'express';
-import { Controller, Get, Query, Route, Tags, Response, Header, Queries } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError } from '@cedelabs-private/sdk';
+import { Controller, Get, Header, Response, Route, Tags } from 'tsoa';
+import { errorHandler } from '../middleware/errorHandler';
 import { ErrorResponse } from '../types';
 import { extractAuthFromHeaders } from '../utils/auth';
-import { errorHandler } from '../middleware/errorHandler';
 
 type GetSupportedExchangesResponse = ReturnType<CedeSDK['api']['getSupportedExchanges']>;
 type FetchExchangeStatusResponse = ReturnType<CedeSDK['api']['fetchExchangeStatus']>;
@@ -61,7 +60,6 @@ export class ExchangeController extends Controller {
   }
 }
 
-// Express router wrapper
 export function exchangeRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new ExchangeController(sdk);

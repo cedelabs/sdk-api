@@ -14,6 +14,7 @@ COPY --chown=node:node . ./
 # Uncomment this line to run on localhost
 # COPY --chown=node:node .env ./
 
+RUN npm i -g corepack@latest
 
 # Install aws cli
 RUN apk update && apk add aws-cli
@@ -33,10 +34,11 @@ RUN aws codeartifact login --tool npm --repository cedelabs-private --domain ced
 
 # Install dependencies
 # We ignore scripts postinstall scripts because we don't need them in the production image
-RUN yarn install --silent --ignore-scripts
+RUN set -ex; \
+    pnpm i
 
 # Build the application
-RUN yarn build
+RUN pnpm build
 
 ###################
 # PRODUCTION

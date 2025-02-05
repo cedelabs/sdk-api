@@ -1,21 +1,21 @@
-import { Router } from 'express';
-import { Body, Controller, Get, Header, Post, Query, Route, Tags, Response, Queries } from 'tsoa';
 import CedeSDK, { PureTransaction } from '@cedelabs-private/sdk';
-import { extractAuthFromHeaders } from '../utils/auth';
-import { OnDepositParams } from '../types/types';
-import { ErrorResponse } from '../types';
+import { Router } from 'express';
+import { Body, Controller, Get, Header, Post, Queries, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
+import { ErrorResponse } from '../types';
+import { OnDepositParams } from '../types/types';
+import { extractAuthFromHeaders } from '../utils/auth';
 
 type GetDepositAddressResponse = ReturnType<CedeSDK['api']['getDepositAddress']>;
 type RetrieveDepositResponse = ReturnType<CedeSDK['api']['retrieveDeposit']>;
 type GetDepositableTokensResponse = ReturnType<CedeSDK['api']['getDepositableTokens']>;
 
-type GetDepositAddressParams = {
+interface GetDepositAddressParams {
   tokenSymbol: string;
   network: string;
 }
 
-type RetrieveDepositParams = {
+interface RetrieveDepositParams {
   txHash: string;
   tokenSymbol: string;
 }
@@ -167,7 +167,6 @@ export class DepositController extends Controller {
   }
 }
 
-// Express router wrapper
 export function depositRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new DepositController(sdk);

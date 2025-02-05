@@ -26,7 +26,7 @@ sdkApi({
 	mode: env.MODE === "MOCK" ? "MOCK" : "REAL",
 	clientId,
 	cache: getCache(),
-	authentication: env.DEMO === "true" ? () => true :  hmacAuthStrategyMiddleware({
+	authentication: env.DEMO === "true" || process.env.SECRET_API_KEY === undefined ? () => true : hmacAuthStrategyMiddleware({
 		secretKey:  process.env.SECRET_API_KEY || "",
 	}),
 });

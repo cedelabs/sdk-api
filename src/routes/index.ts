@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { portfolioRoutes } from './portfolio.controller';
-import { withdrawalRoutes } from './withdrawal.controller';
-import { networksRoutes } from './networks.controller';
+import { authenticationRoutes } from './authentication.controller';
 import { depositRoutes } from './deposit.controller';
 import { exchangeRoutes } from './exchange.controller';
-import { authenticationRoutes } from './authentication.controller';
+import { networksRoutes } from './networks.controller';
+import { portfolioRoutes } from './portfolio.controller';
 import { pricesRoutes } from './prices.controller';
-import { tradeRoutes } from './trade.controller';
-import { tokensRoutes } from './tokens.controller';
 import { subAccountRoutes } from './subAccount.controller';
+import { tokensRoutes } from './tokens.controller';
+import { tradeRoutes } from './trade.controller';
+import { withdrawalRoutes } from './withdrawal.controller';
 
 export function setupRoutes(sdk: any) {
     const router = Router();

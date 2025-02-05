@@ -1,16 +1,16 @@
-import { Router } from 'express';
-import { Body, Controller, Delete, Get, Header, Path, Post, Put, Query, Route, Tags, Response, Queries } from 'tsoa';
-import {processError } from '../utils/error';
-import CedeSDK, { CedeSDKError, 
-  CreateOrderParams as CreateOrderParamsType, 
-  UpdateOrderParams as UpdateOrderParamsType, 
-  PrepareOrderParams as PrepareOrderParamsType, 
-  CancelOrderParams as CancelOrderParamsType 
+import CedeSDK, {
+  CedeSDKError,
+  CreateOrderParams as CreateOrderParamsType,
+  PrepareOrderParams as PrepareOrderParamsType,
+  UpdateOrderParams as UpdateOrderParamsType
 } from '@cedelabs-private/sdk';
-import { AuthParams } from '../utils/typeUtils';
-import { extractAuthFromHeaders } from '../utils/auth';
-import { ErrorResponse } from '../types';
+import { Router } from 'express';
+import { Body, Controller, Delete, Get, Header, Path, Post, Put, Queries, Query, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
+import { ErrorResponse } from '../types';
+import { extractAuthFromHeaders } from '../utils/auth';
+import { processError } from '../utils/error';
+import { AuthParams } from '../utils/typeUtils';
 
 type PrepareOrderParams = Omit<PrepareOrderParamsType, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'exchange'> & {
   auth: AuthParams;
@@ -32,12 +32,12 @@ type GetOrderResponse = ReturnType<CedeSDK['api']['getOrder']>;
 type GetOpenOrdersResponse = ReturnType<CedeSDK['api']['getOpenOrders']>;
 type GetMinAmountsResponse = ReturnType<CedeSDK['api']['getMinAmounts']>;
 type CancelOrderResponse = ReturnType<CedeSDK['api']['cancelOrder']>;
-type GetOpenOrdersParams = {
+interface GetOpenOrdersParams {
   pairSymbol: string;
   since?: number;
   limit?: number;
 }
-type GetMinAmountsParams = {
+interface GetMinAmountsParams {
   pairSymbol: string;
   orderSide: "buy" | "sell";
   price: string;

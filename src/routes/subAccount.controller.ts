@@ -1,11 +1,10 @@
+import CedeSDK, { SubAccountTransferParams as CedeSDKSubAccountTransferParams, SubAccountTransferResponse } from '@cedelabs-private/sdk';
 import { Router } from 'express';
-import { Body, Controller, Get, Header, Post, Query, Route, Tags, Response } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError, SubAccountTransferResponse, SubAccountTransferParams as CedeSDKSubAccountTransferParams } from '@cedelabs-private/sdk';
-import { AuthParams } from '../utils/typeUtils';
-import { extractAuthFromHeaders } from '../utils/auth';
-import { ErrorResponse } from '../types';
+import { Body, Controller, Get, Header, Post, Query, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
+import { ErrorResponse } from '../types';
+import { extractAuthFromHeaders } from '../utils/auth';
+import { AuthParams } from '../utils/typeUtils';
 
 type GetSubAccountsResponse = ReturnType<CedeSDK['api']['getSubAccounts']>;
 type GetSubAccountBalancesResponse = ReturnType<CedeSDK['api']['getSubAccountBalances']>;
@@ -98,7 +97,6 @@ export class SubAccountController extends Controller {
   }
 }
 
-// Express router wrapper
 export function subAccountRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new SubAccountController(sdk);

@@ -1,9 +1,8 @@
-// sdk-api/src/routes/tokens.ts
-import { Router } from 'express';
-import { Controller, Get, Route, Tags, Query, Header, Response } from 'tsoa';
 import CedeSDK from '@cedelabs-private/sdk';
-import { ErrorResponse } from '../types';
+import { Router } from 'express';
+import { Controller, Get, Header, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
+import { ErrorResponse } from '../types';
 import { extractAuthFromHeaders } from '../utils/auth';
 
 type GetSupportedTokensResponse = ReturnType<CedeSDK['api']['getSupportedTokens']>;

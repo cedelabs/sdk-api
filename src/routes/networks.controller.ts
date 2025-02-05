@@ -1,14 +1,14 @@
-import { Router } from 'express';
-import { Controller, Get, Header, Path, Query, Route, Tags, Response, Queries } from 'tsoa';
 import CedeSDK from '@cedelabs-private/sdk';
-import { extractAuthFromHeaders } from '../utils/auth';
-import { ErrorResponse } from '../types';
+import { Router } from 'express';
+import { Controller, Get, Header, Queries, Query, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
+import { ErrorResponse } from '../types';
+import { extractAuthFromHeaders } from '../utils/auth';
 
 
 type GetNetworksResponse = ReturnType<CedeSDK['api']['getNetworks']>;
 type GetAvailableNetworksResponse = ReturnType<CedeSDK['api']['getAvailableNetworks']>;
-type GetNetworksParams = {
+interface GetNetworksParams {
   tokenSymbol?: string;
   toDeposit?: boolean;
   toWithdraw?: boolean;
@@ -68,7 +68,6 @@ export class NetworksController extends Controller {
   }
 }
 
-// Express router wrapper
 export function networksRoutes(sdk: CedeSDK) {
   const router = Router();
   const controller = new NetworksController(sdk);

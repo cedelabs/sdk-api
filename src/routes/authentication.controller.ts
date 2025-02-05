@@ -1,17 +1,17 @@
+import CedeSDK, { ApiKey, ApiPermissions, CedeSDKError, GetOAuthTokensParams, OAuthClientCredentialsParams } from '@cedelabs-private/sdk';
 import { Router } from 'express';
-import { Body, Controller, Get, Post, Route, Tags, Response, Queries, Header } from 'tsoa';
-import { processError } from '../utils/error';
-import CedeSDK, { CedeSDKError, GetOAuthTokensParams, OAuthClientCredentialsParams, ApiPermissions, ApiKey } from '@cedelabs-private/sdk';
-import { ErrorResponse } from '../types';
+import { Body, Controller, Get, Header, Post, Queries, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
+import { ErrorResponse } from '../types';
+import { processError } from '../utils/error';
 
-type GetOAuthUrlParams = {
+interface GetOAuthUrlParams {
   redirectUri: string;
   permissions: ApiPermissions[];
   deviceId?: string;
 }
 
-type GetFastApiKeysParams = {
+interface GetFastApiKeysParams {
   accessToken: string;
   permissions?: ApiPermissions[];
 }
