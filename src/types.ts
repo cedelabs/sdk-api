@@ -1,7 +1,6 @@
 import {
 	Any,
 	SdkCacheStorage,
-	CredentialsStorage,
 	DefiInfoTx,
 	EventEmitterDataTypes,
 	PureCefiInfoTx,
@@ -19,6 +18,12 @@ export type AuthenticationMiddlewareFactory<T extends Record<string, any>> = (
 	config: T
 ) => AuthenticationMiddleware;
 
+export interface ErrorResponse {
+	name: string;
+	code: number;
+	message: string;
+	originalErrorMessage?: string;
+  }
 export type SdkApiConfiguration = {
 	/**
 	 * Mode of the SDK.
@@ -32,10 +37,6 @@ export type SdkApiConfiguration = {
 	 * Client id provided by Cede Labs
 	 */
 	clientId: string;
-	/**
-	 * Storage implementation for credentials provider
-	 */
-	credentials?: CredentialsStorage | Promise<CredentialsStorage>;
 	/**
 	 * Storage implementation for cache provider
 	 */

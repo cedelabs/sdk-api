@@ -1,5 +1,5 @@
-import { AuthenticationMiddlewareFactory } from "../types";
 import crypto from "crypto";
+import { AuthenticationMiddlewareFactory } from "../types";
 
 const sign = (payload: string, secret: string) => {
 	return crypto.createHmac("sha512", secret).update(payload).digest("hex");

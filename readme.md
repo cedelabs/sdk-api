@@ -38,12 +38,12 @@ aws codeartifact login --tool npm --repository cedelabs-private --domain cedelab
 
 **4. Install the dependencies**
 ```
-yarn install
+pnpm i
 ```
 
 **5. Start the server in dev mode**
 ```
-yarn dev
+pnpm dev
 ```
 
 or using docker
@@ -78,27 +78,6 @@ sdkApi({
 });
 ```
 
-- `credentials`, optional: If you need to get the credentials from a specific storage system, you can provide a connector to the SDK Api. The instantiation could be asynchrone if you need to connect to an external database.
-```typescript
-sdkApi({
-  ...config,
-	credentials: {
-		get: async () => {
-			// Fetch credentials from your own storage.
-			// This is called when the SDK needs credentials to make API calls.
-		},
-		set: async (credentials) => {
-			// Store the credentials in your own storage.
-			// This is called when the SDK has new credentials to store.
-		},
-		remove: async () => {
-			// Remove the credentials from your own storage.
-			// This is called when the SDK needs to remove credentials.
-		}
-	},
-});
-```
-
 - `authentication`, optional (but highly recommended): Authentication strategy callback for protecting the access to the SDK server. You can implement your own strategy or using the already implemented `keyAuthStrategyMiddleware` or `hmacAuthStrategyMiddleware`.
 ```typescript
 sdkApi({
@@ -106,27 +85,6 @@ sdkApi({
 	authentication: hmacAuthStrategyMiddleware({
 		secretKey: process.env.SECRET_API_KEY || "",
 	}),
-});
-```
-
-- `webhookHeaders`, optional: A function designed to generate additional headers for inclusion in requests sent to a webhook endpoint. It can be useful to authenticate the webhook call. <br />
-*The webhook can be triggered when the service detects a state change within the Exchange after the call of a one time listener (like `onDeposit` method, see the [documentation](https://docs-sdk.cede.store/documentation/api-reference/deposit#on-deposit-callback?mode=http)). It facilitates the transmission of updated data back to the client.*
-```typescript
-sdkApi({
-  ...config,
-	webhookHeaders: async (req: Request) => ({
-    'x-signature': await generateSignature(req)
-  })
-});
-```
-
-- `onDeposit`, optional: If you don't want to use a webhook to receive the data from the one-time listener `onDeposit`, you can implement this method. Once the deposit will be received by the SDK, this method will be called. 
-```typescript
-sdkApi({
-  ...config,
-	onDeposit: (tx: PureTransaction) => {
-    // ... Insert business logic here
-  }
 });
 ```
 
@@ -169,6 +127,40 @@ POST /execute?method=<method_name>
 ```
 
 Please read the Cede SDK [documentation](https://docs-sdk.cede.store/documentation/general-info) to understand how it works.
+
+## OpenAPI Documentation
+
+This project uses TSOA to automatically generate OpenAPI 3.0 documentation from TypeScript code. To generate and use the API documentation:
+
+1. Generate the OpenAPI specification and routes:
+```bash
+pnpm tsoa spec
+pnpm tsoa routes
+```
+
+2. Build the project:
+```bash
+pnpm build
+```
+
+This provides clear instructions for generating and using the API documentation while highlighting the important steps for setting up Postman correctly.
+
+### Using with Postman
+
+1. Import the generated `swagger.json` file into Postman
+2. Replace the placeholder values in headers:
+   - `x-exchange-id`: Your exchange instance ID
+   - `x-exchange-api-key`: Your API key
+   - `x-exchange-api-secret`: Your API secret
+   - `x-exchange-api-uid`: Your exchange UID (if required, check with `exchange/supported` endpoint)
+   - `x-exchange-api-password`: Your exchange password (if required, check with `exchange/supported` endpoint)
+
+3. Update request parameters:
+   - For GET requests: Fill in the required query parameters
+   - For POST requests: Provide the required request body
+
+The imported documentation includes detailed descriptions of all endpoints, required parameters, and expected responses.
+
 
 ## Support
 

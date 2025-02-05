@@ -5,18 +5,23 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch src/index",
-		"build": "npx pkgroll",
+		"dev": "tsoa spec && tsoa routes && tsx watch src/index",
+		"build": "tsoa spec && tsoa routes && npx pkgroll",
 		"start": "node dist/index.js",
 		"test": "vitest"
 	},
 	"dependencies": {
-		"@cedelabs-private/sdk": "^2.8.0",
+		"@cedelabs-private/sdk": "2.9.0",
+		"body-parser": "^1.20.3",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
+		"express-openapi-validator": "^5.4.2",
 		"mongoose": "^8.7.1",
+		"node": "^23.7.0",
 		"object-sizeof": "^2.6.5",
-		"redis": "^4.7.0"
+		"redis": "^4.7.0",
+		"tsoa": "^6.6.0",
+		"v18": "^1.0.2"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.21",

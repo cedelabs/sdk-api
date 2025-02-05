@@ -1,0 +1,20 @@
+{
+    "entryFile": "src/app.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": ["src/**/*.controller.ts"],
+    "spec": {
+        "outputDirectory": "dist",
+        "specVersion": 3,
+        "host": "localhost:3000",
+        "basePath": "/api/v1",
+        "schemes": ["http"],
+        "info": {
+            "title": "Cede SDK API",
+            "version": "1.0.0"
+        }
+    },
+    "routes": {
+      "routesDir": "dist",
+      "middleware": "express"
+    }
+}
