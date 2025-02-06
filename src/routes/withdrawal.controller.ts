@@ -101,7 +101,11 @@ export class WithdrawalController extends Controller {
   @Response<ErrorResponse>(503, 'Service Unavailable')
   @Response<ErrorResponse>(402, 'Insufficient balance')
   public async createWithdrawal(@Body() params: CreateWithdrawalParams): Promise<CreateWithdrawalResponse> {
-    return await this.sdk.api.createWithdrawal(params);
+    const createWithdrawalParams = {
+      ...params,
+      fromExchangeInstanceId: params.auth.exchangeInstanceId,
+    };
+    return await this.sdk.api.createWithdrawal(createWithdrawalParams);
   }
 
   /**
@@ -119,7 +123,11 @@ export class WithdrawalController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async prepareWithdrawal(@Body() params: PrepareWithdrawalParams): Promise<PrepareWithdrawalResponse> {
-    return await this.sdk.api.prepareWithdrawal(params);
+    const prepareWithdrawalParams = {
+      ...params,
+      fromExchangeInstanceId: params.auth.exchangeInstanceId,
+    };
+    return await this.sdk.api.prepareWithdrawal(prepareWithdrawalParams);
   }
 
   /**
@@ -231,16 +239,17 @@ export function withdrawalRoutes(sdk: any) {
   const controller = new WithdrawalController(sdk);
 
   router.get('/:withdrawalId', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
     const result = await controller.getWithdrawalById(
       req.params.withdrawalId,
       req.query.tokenSymbol as string,
       Number(req.query.timestamp),
-      req.query.exchangeInstanceId as string,
-      req.query.exchangeId as string,
-        req.header('x-exchange-api-key') as string,
-        req.header('x-exchange-api-secret') as string,
-        req.header('x-exchange-api-password') as string,
-        req.header('x-exchange-api-uid') as string
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid
       );
     res.json(result);
   }));

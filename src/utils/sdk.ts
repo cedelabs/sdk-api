@@ -7,7 +7,8 @@ export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 	const sdk = new CedeSDK(configuration.mode, {
 		clientId: configuration.clientId,
 		proxyUrl: configuration.proxyUrl,
-		cacheStorage: await configuration.cache
+		cacheStorage: await configuration.cache,
+		verbose: configuration.verbose
 	});
 
 	if (configuration.listenerByEvent) {

@@ -20,9 +20,5 @@ export function extractAuthFromHeaders(req: Request): AuthParams {
     auth.uid = req.headers['x-exchange-api-uid'] as string;
   }
 
-  if (!auth.apiKey || !auth.secretKey) {
-    throw new Error('Missing required authentication headers');
-  }
-
   return auth;
 } 

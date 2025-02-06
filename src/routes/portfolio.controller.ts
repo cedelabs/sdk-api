@@ -110,7 +110,6 @@ export function portfolioRoutes(sdk: CedeSDK) {
         auth.password,
       auth.uid
     );
-    console.log("balances", result);
     res.json(result);
   }));
 

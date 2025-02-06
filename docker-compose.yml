@@ -6,17 +6,12 @@ services:
         AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     ports:
-      - "3000:3000"
+      - "${APP_PORT}:${APP_PORT}"
     environment:
-      - CLIENT_ID=${CEDE_CLIENT_ID}
-      - SECRET_API_KEY=${CEDE_SECRET_API_KEY}
+      - CLIENT_ID=${CLIENT_ID}
+      - SECRET_API_KEY=${SECRET_API_KEY}
       - REDIS_URL=${REDIS_URL}
-      - PORT=3000
-      - NODE_ENV=production
-
-    
-secrets:
-  aws_access_key_id:
-    environment: "AWS_ACCESS_KEY_ID"
-  aws_secret_access_key:
-    environment: "AWS_SECRET_ACCESS_KEY"
+      - MONGODB_URL=${MONGODB_URL}
+      - APP_PORT=${APP_PORT}
+      - MODE=${MODE}
+      - PROXY_URL=${PROXY_URL}

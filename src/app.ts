@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import express, { Express } from "express";
 import * as OpenApiValidator from 'express-openapi-validator';
 import path, { join } from "path";
+import { globalErrorHandler } from './middleware/globalErrorHandler';
 import { setupRoutes } from "./routes";
 import { healthRoutes } from './routes/health.controller';
 import { SdkApiConfiguration } from "./types";
@@ -12,7 +13,7 @@ const __dirname = path.resolve();
 export async function sdkApi(configuration: SdkApiConfiguration) {
   const sdk = await setupCedeSdk(configuration);
   const app: Express = express();
-  const port = process.env.PORT || 3000;
+  const port = process.env.APP_PORT || 3000;
 
   process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
@@ -36,6 +37,15 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   app.use('/api/v1/health', healthRoutes());
   
   app.use(bodyParser.json());
+
+  if (process.env.MODE === "MOCK") {
+    app.use((req, _res, next) => {
+      req.headers['x-exchange-api-key'] = req.headers['x-exchange-api-key'] || 'demo-api-key';
+      req.headers['x-exchange-api-secret'] = req.headers['x-exchange-api-secret'] || 'demo-secret-key';
+      next();
+    });
+  }
+
   app.use(
     OpenApiValidator.middleware({
       apiSpec: join(__dirname, '/dist/swagger.json'),
@@ -66,14 +76,16 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
       } catch (error) {
         res.status(500).json({
           name: "AuthenticationError",
-          message: "Authentication check failed. Please check the authentication middleware implementation",
+          message: error instanceof Error ? error.message : "Authentication check failed",
           code: 500,
         });
-      }
+      } 
     });
   }
 
   app.use('/api/v1', setupRoutes(sdk));
+
+  app.use(globalErrorHandler);
 
   const server = app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

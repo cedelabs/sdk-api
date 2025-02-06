@@ -1,10 +1,10 @@
 import {
 	Any,
-	SdkCacheStorage,
 	DefiInfoTx,
 	EventEmitterDataTypes,
 	PureCefiInfoTx,
 	PureTransaction,
+	SdkCacheStorage,
 } from "@cedelabs-private/sdk";
 import { NextFunction, Request, Response } from "express";
 
@@ -45,6 +45,13 @@ export type SdkApiConfiguration = {
 	 * Proxy URL to be used for making Exchange API calls for some exchanges that require it.
 	 */
 	proxyUrl?: string;
+	/**
+	 * Verbose mode.
+	 * 
+	 * - `"vv"`: Prints all network requests/responses and logs.
+	 * - `"v"`: Additional logs.
+	 */
+	verbose?: "vv" | "v";
 	/**
 	 * Plug in your own event listeners for the SDK by event name.
 	 */
