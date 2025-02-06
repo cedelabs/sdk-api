@@ -42,6 +42,8 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
     app.use((req, _res, next) => {
       req.headers['x-exchange-api-key'] = req.headers['x-exchange-api-key'] || 'demo-api-key';
       req.headers['x-exchange-api-secret'] = req.headers['x-exchange-api-secret'] || 'demo-secret-key';
+      req.headers['x-exchange-api-password'] = req.headers['x-exchange-api-password'] || 'demo-password';
+      req.headers['x-exchange-api-uid'] = req.headers['x-exchange-api-uid'] || 'demo-uid';
       next();
     });
   }
