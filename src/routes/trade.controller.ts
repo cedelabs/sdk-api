@@ -278,12 +278,14 @@ export function tradeRoutes(sdk: CedeSDK) {
 
   router.get('/market-pairs', async (req, res) => {
     try {
+      const auth = extractAuthFromHeaders(req);
       const result = await controller.getMarketPairs(
-        req.query.exchangeId as string,
-        req.query.apiKey as string,
-        req.query.secretKey as string,
-        req.query.password as string,
-        req.query.uid as string
+        auth.exchangeInstanceId,
+        auth.exchangeId,
+        auth.apiKey,
+        auth.secretKey,
+        auth.password,
+        auth.uid
       );
       res.json(result);
     } catch (error) {
@@ -295,16 +297,16 @@ export function tradeRoutes(sdk: CedeSDK) {
 
   router.get('/market-rate', errorHandler(async (req, res) => {
     const auth = extractAuthFromHeaders(req);
-      const result = await controller.getMarketRate( 
-        req.query.pairSymbol as string,
-        req.query.exchangeInstanceId as string, 
-        req.query.exchangeId as string,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
+    const result = await controller.getMarketRate( 
+      req.query.pairSymbol as string,
+      auth.exchangeInstanceId, 
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
   }));
 
   router.get('/min-amounts', errorHandler(async (req, res) => {

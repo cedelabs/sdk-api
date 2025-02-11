@@ -1,9 +1,9 @@
 import CedeSDK, { CedeSDKEvents, EventEmitterDataTypes } from "@cedelabs-private/sdk";
 import { SdkApiConfiguration } from "../types";
 import { logger } from '../services/logger';
+import { setupMetrics } from "../services/sdk.metrics";
 
 // @todo add back the HydrationItem
-
 export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 	const sdk = new CedeSDK(configuration.mode, {
 		clientId: configuration.clientId,
@@ -27,6 +27,8 @@ export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 			);
 		});
 	}
+
+	setupMetrics(sdk);
 
 	return sdk;
 }
