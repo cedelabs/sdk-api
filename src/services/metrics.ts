@@ -5,12 +5,35 @@ export class MetricsService {
   private static instance: MetricsService;
   private registry: Registry;
   
+  /**
+   * @description
+   * Histogram to record the duration of a method call.
+   */
   private methodDuration: Histogram;
+  /**
+   * @description
+   * Histogram to record the duration of an exchange endpoint call.
+   */
   private endpointDuration: Histogram;
+  /**
+   * @description
+   * Counter to record the number of times a method is called.
+   */
   private methodCalls: Counter;
+  /**
+   * @description
+   * Counter to record the number of times an exchange endpoint is called.
+   */
   private endpointCalls: Counter;
+  /**
+   * @description
+   * Gauge to record the size of the throttler queues for each exchange and priority.
+   */
   private throttlerQueueSize: Gauge;
-  // Keep track of max values between scrapes
+  /**
+   * @description
+   * Keep track of max values between scrapes
+   */
   private maxQueueSizes: Map<string, number> = new Map();
 
   private constructor() {
@@ -64,19 +87,52 @@ export class MetricsService {
     return MetricsService.instance;
   }
 
+  /**
+   * @description
+   * Start a timer for a method call.
+   * Used to record the duration of a method call, for example, to retrieve the balances.
+   */
   public startMethodTimer() {
     return this.methodDuration.startTimer();
   }
 
-  public recordMethodCall(method: string, exchangeId: string, exchangeInstanceId: string, status: 'success' | 'error') {
+  /**
+   * @description
+   * Record the number of times a method is called.
+   */
+  public recordMethodCall({
+    method,
+    exchangeId,
+    exchangeInstanceId,
+    status
+  }: {
+    method: string, exchangeId: string, exchangeInstanceId: string, status: 'success' | 'error'
+  }) {
     this.methodCalls.labels(method, exchangeId, exchangeInstanceId, status).inc();
   }
 
-  public recordEndpointCall(path: string, method: string, exchangeId: string, status: number, durationMs: number) {
+  /**
+   * @description
+   * Record the number of times an exchange endpoint is called and the duration of the call.
+   */
+  public recordEndpointCall({
+    path,
+    method,
+    exchangeId,
+    status,
+    durationMs
+  }: {
+    path: string, method: string, exchangeId: string, status: number, durationMs: number
+  }) {
     this.endpointCalls.labels(path, method, exchangeId, status?.toString?.()).inc();
     this.endpointDuration.labels(path, method, exchangeId, status?.toString?.()).observe(durationMs);
   }
 
+  /**
+   * @description
+   * Used to track the max size of the throttler queues for each exchange and priority.
+   * As it updates very frequently, we record the highest value between scrapes.
+   */
   public recordThrottlerQueues(queues: { exchangeId: string; queuesSize: Record<string, number> }[]) {
     const reportedQueues = new Map(
       queues.map(({ exchangeId, queuesSize }) => [exchangeId, queuesSize])
@@ -90,7 +146,6 @@ export class MetricsService {
         CustomThrottlePriority.MEDIUM,
         CustomThrottlePriority.LOW
       ]) {
-        console.log("setting max", exchangeId, priority, queueSizes[priority])
         const key = `${exchangeId}:${priority}`;
         const size = queueSizes[priority] || 0;
         const currentMax = this.maxQueueSizes.get(key) || 0;
@@ -99,6 +154,12 @@ export class MetricsService {
     }
   }
 
+   /**
+   * @description
+   * Record the size of the throttler queues for each exchange and priority.
+   * The throttler is used to limit the number of requests to exchanges.
+   * We update the gauges with the max size of the queues between scrapes.
+   */
   public updateGauges() {
     this.throttlerQueueSize.reset();
     

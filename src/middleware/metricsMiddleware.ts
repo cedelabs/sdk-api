@@ -63,9 +63,9 @@ export function metricsMiddleware() {
     const originalSend = res.json;
     res.json = function(body) {
       if (res.statusCode >= 400) {
-        metrics.recordMethodCall(method, exchangeId, exchangeInstanceId, 'error');
+        metrics.recordMethodCall({method, exchangeId, exchangeInstanceId, status: 'error'});
       } else {
-        metrics.recordMethodCall(method, exchangeId, exchangeInstanceId, 'success');
+        metrics.recordMethodCall({method, exchangeId, exchangeInstanceId, status: 'success'});
       }
       
       end({ 
@@ -78,7 +78,7 @@ export function metricsMiddleware() {
     };
 
     res.on('error', () => {
-      metrics.recordMethodCall(method, exchangeId, exchangeInstanceId, 'error');
+      metrics.recordMethodCall({method, exchangeId, exchangeInstanceId, status: 'error'});
       end({ 
         method, 
         exchange_id: exchangeId, 
