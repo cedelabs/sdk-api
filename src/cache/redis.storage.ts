@@ -1,7 +1,7 @@
 import { Any, SdkCacheStorage, SDKCacheItem } from "@cedelabs-private/sdk";
 import { createClient, RedisClientType } from "redis";
 import { safeJsonParse } from "../utils/json";
-
+import { logger } from "../services/logger";
 export type RedisCacheStorageConfig = {
 	url: string;
 };
@@ -21,7 +21,7 @@ export class RedisCacheStorage implements SdkCacheStorage {
 		this.client = createClient({
 			url: config.url,
 		}).on("error", (err) =>
-			console.log("Redis Client Error", err)
+			logger.error("Redis Client Error", err)
 		) as RedisClientType;
 	}
 

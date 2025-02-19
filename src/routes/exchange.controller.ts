@@ -46,16 +46,10 @@ export class ExchangeController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async fetchExchangeStatus(
-    @Header('x-exchange-instance-id') exchangeInstanceId: string,
-    @Header('x-exchange-id') exchangeId: string,
-    @Header('x-exchange-api-key') apiKey: string,
-    @Header('x-exchange-api-secret') secretKey: string,
-    @Header('x-exchange-api-password') password?: string,
-    @Header('x-exchange-api-uid') uid?: string,
+    @Header('x-exchange-id') exchangeId: string 
   ): Promise<FetchExchangeStatusResponse> {
     return await this.sdk.api.fetchExchangeStatus({ 
-      exchangeInstanceId, 
-      auth: { exchangeId, apiKey, secretKey, password, uid } 
+      exchangeId    
     });
   }
 }
@@ -72,12 +66,7 @@ export function exchangeRoutes(sdk: CedeSDK) {
   router.get('/status', errorHandler(async (req, res) => {
     const auth = extractAuthFromHeaders(req);
     const result = await controller.fetchExchangeStatus(
-      auth.exchangeInstanceId,
       auth.exchangeId,
-      auth.apiKey,
-      auth.secretKey,
-      auth.password,
-      auth.uid
     );
     res.json(result);
   }));

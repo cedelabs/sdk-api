@@ -3,6 +3,7 @@ import mongoose, { Schema } from "mongoose";
 import { Types } from "mongoose";
 import sizeof from "object-sizeof";
 import { splitDataToChunks } from "../utils/split";
+import { logger } from '../services/logger';
 
 type MongoSdkCacheItem = SDKCacheItem<Any> & {
 	compoundData?: SDKCacheItem<Any>[];
@@ -39,7 +40,7 @@ export class MongoCacheStorage implements SdkCacheStorage {
 
 	async connect() {
 		await mongoose.connect(this.config.url);
-		console.log("Connected to MongoDB");
+		logger.info('Connected to MongoDB');
 	}
 
 	init(data: Map<string, SDKCacheItem<Any>>): void {
@@ -102,7 +103,7 @@ export class MongoCacheStorage implements SdkCacheStorage {
 		await MongoCacheItem.updateOne({ key }, item, { upsert: true })
 			.exec()
 			.catch((err) => {
-				console.error(err);
+				logger.error('Error updating cache item:', err);
 			});
 	}
 

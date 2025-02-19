@@ -7,6 +7,7 @@ import { setupRoutes } from "./routes";
 import { healthRoutes } from './routes/health.controller';
 import { SdkApiConfiguration } from "./types";
 import { setupCedeSdk } from "./utils/sdk";
+import { logger } from './services/logger';
 
 const __dirname = path.resolve();
 
@@ -16,20 +17,20 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   const port = process.env.APP_PORT || 3000;
 
   process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
+    logger.error('Uncaught Exception:', error);
     startGracefulShutdown();
   });
 
   process.on('unhandledRejection', (error) => {
-    console.error('Unhandled Rejection:', error);
+    logger.error('Unhandled Rejection:', error);
     startGracefulShutdown();
   });
 
   function startGracefulShutdown() {
-    console.log('Starting graceful shutdown...');
+    logger.info('Starting graceful shutdown...');
     
     server.close(() => {
-      console.log('Server closed');
+      logger.info('Server closed');
       process.exit(1);
     });
   }
@@ -90,7 +91,7 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   app.use(globalErrorHandler);
 
   const server = app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
+    logger.info(`Server is running at http://localhost:${port}`);
   });
 
   process.on('SIGTERM', startGracefulShutdown);

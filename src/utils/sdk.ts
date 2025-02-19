@@ -1,5 +1,6 @@
 import CedeSDK, { CedeSDKEvents, EventEmitterDataTypes } from "@cedelabs-private/sdk";
 import { SdkApiConfiguration } from "../types";
+import { logger } from '../services/logger';
 
 // @todo add back the HydrationItem
 
@@ -8,7 +9,8 @@ export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 		clientId: configuration.clientId,
 		proxyUrl: configuration.proxyUrl,
 		cacheStorage: await configuration.cache,
-		verbose: configuration.verbose
+		verbose: configuration.verbose,
+		logger
 	});
 
 	if (configuration.listenerByEvent) {

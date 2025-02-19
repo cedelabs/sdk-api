@@ -7,7 +7,7 @@ import { sdkApi } from "./app";
 import { hmacAuthStrategyMiddleware } from "./authentication/hmac.strategy";
 import { MongoCacheStorage } from "./cache/mongo.storage";
 import { RedisCacheStorage } from "./cache/redis.storage";
-
+import { logger } from "./services/logger";
 const getCache = () => {
 	if (process.env.REDIS_URL) {
 		return RedisCacheStorage.create({
@@ -30,7 +30,7 @@ const secretApiKey = process.env.SECRET_API_KEY || "";
 const proxyUrl = process.env.PROXY_URL || "";
 const verbose = process.env.VERBOSE as "vv" | "v" | undefined;
 
-console.log(`SDK-API config: 
+logger.info(`SDK-API config: 
 
 	mode: ${env.MODE === "MOCK" ? "MOCK" : "REAL"},
 	clientId: ${clientId},
