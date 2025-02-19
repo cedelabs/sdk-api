@@ -8,6 +8,8 @@ import { healthRoutes } from './routes/health.controller';
 import { SdkApiConfiguration } from "./types";
 import { setupCedeSdk } from "./utils/sdk";
 import { logger } from './services/logger';
+import { metricsMiddleware } from './middleware/metricsMiddleware';
+import { MetricsService } from './services/metrics';
 
 const __dirname = path.resolve();
 
@@ -35,7 +37,7 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
     });
   }
 
-  app.use('/api/v1/health', healthRoutes());
+  app.use('/health', healthRoutes());
   
   app.use(bodyParser.json());
 
@@ -86,7 +88,26 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
     });
   }
 
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/health') || req.path.startsWith('/metrics')) {
+      return next();
+    }
+    metricsMiddleware()(req, res, next);
+  });
+
   app.use('/api/v1', setupRoutes(sdk));
+
+  global.metricsService = MetricsService.getInstance();
+  
+  app.get('/metrics', async (_req, res) => {
+    try {
+      const metrics = await MetricsService.getInstance().getMetrics();
+      res.set('Content-Type', 'text/plain');
+      res.send(metrics);
+    } catch (error) {
+      res.status(500).send('Error collecting metrics');
+    }
+  });
 
   app.use(globalErrorHandler);
 

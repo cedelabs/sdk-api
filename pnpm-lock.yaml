@@ -32,6 +32,9 @@ importers:
       object-sizeof:
         specifier: ^2.6.5
         version: 2.6.5
+      prom-client:
+        specifier: ^15.1.3
+        version: 15.1.3
       redis:
         specifier: ^4.7.0
         version: 4.7.0
