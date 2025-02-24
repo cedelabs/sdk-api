@@ -23,7 +23,7 @@ jobs:
         id: versions
         run: |
           API_VERSION=$(node -p "require('./package.json').version")
-          SDK_VERSION=$(node -p "require('./node_modules/@cedelabs-private/sdk/package.json').version")
+          SDK_VERSION=$(node -p "require('./package.json').dependencies['@cedelabs-private/sdk'].replace('^', '')")
           VERSION="${API_VERSION}+sdk${SDK_VERSION}"
           echo "api_version=${API_VERSION}" >> $GITHUB_OUTPUT
           echo "sdk_version=${SDK_VERSION}" >> $GITHUB_OUTPUT
