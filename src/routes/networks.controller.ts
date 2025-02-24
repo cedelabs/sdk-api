@@ -21,9 +21,11 @@ export class NetworksController extends Controller {
   }
 
   /**
-   * Get all available networks.
-   * Retrieves supported blockchain networks for a specific exchange.
-   * Includes network status and configuration details.
+   * Get all available networks for a specific exchange.
+   * Use this endpoint to retrieve networks to deposit or withdraw from.
+   * This endpoint requires an authentication.
+   * 
+   * If you need to display all networks without authentication, use the `/networks/available` endpoint.
    */
   @Get()
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -58,9 +60,10 @@ export class NetworksController extends Controller {
   }
 
   /**
-   * Get networks with active status.
-   * Retrieves only currently operational blockchain networks.
-   * Filters networks based on deposit and withdrawal availability.
+   * Retrieves all networks available for a specific exchange.
+   * This endpoint does not require authentication, it's useful to display all networks to the user before he adds an account.
+   * 
+   * However, we recommend using the `/networks` endpoint to get the most relevant networks based on the user's country (exchanges might not allow using specific networks/tokens from certain countries).
    */
   @Get('available')
   public async getAvailableNetworks(@Query() exchangeId: string, @Query() toDeposit?: boolean, @Query() toWithdraw?: boolean): Promise<GetAvailableNetworksResponse> {

@@ -10,6 +10,7 @@ export async function setupCedeSdk(configuration: SdkApiConfiguration) {
 		proxyUrl: configuration.proxyUrl,
 		cacheStorage: await configuration.cache,
 		verbose: configuration.verbose,
+		disableTelemetry: true,	
 		logger
 	});
 

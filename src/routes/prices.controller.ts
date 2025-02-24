@@ -2,7 +2,7 @@ import CedeSDK from '@cedelabs-private/sdk';
 import { Router } from 'express';
 import { Controller, Get, Query, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
-type GetPricesResponse = ReturnType<CedeSDK['api']['getPrices']>;
+type GetPricesResponse = ReturnType<CedeSDK['api']['getPricesV2']>;
 type GetFiatCurrenciesResponse = ReturnType<CedeSDK['api']['getFiatCurrencies']>;
 
 @Route('prices')
@@ -21,7 +21,7 @@ export class PricesController extends Controller {
   public async getPrices(
     @Query() exchangeId?: string,
   ): Promise<GetPricesResponse> {
-    return await this.sdk.api.getPrices({
+    return await this.sdk.api.getPricesV2({
       exchangeId,
     });
   }

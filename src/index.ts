@@ -8,6 +8,10 @@ import { hmacAuthStrategyMiddleware } from "./authentication/hmac.strategy";
 import { MongoCacheStorage } from "./cache/mongo.storage";
 import { RedisCacheStorage } from "./cache/redis.storage";
 import { logger } from "./services/logger";
+import { version as apiVersion } from '../package.json';
+import { version as sdkVersion } from '@cedelabs-private/sdk';
+import { VERSION } from './app';
+
 const getCache = () => {
 	if (process.env.REDIS_URL) {
 		return RedisCacheStorage.create({
@@ -31,7 +35,9 @@ const proxyUrl = process.env.PROXY_URL || "";
 const verbose = process.env.VERBOSE as "vv" | "v" | undefined;
 
 logger.info(`SDK-API config: 
-
+	version: ${VERSION}
+	api: ${apiVersion}
+	sdk: ${sdkVersion}
 	mode: ${env.MODE === "MOCK" ? "MOCK" : "REAL"},
 	clientId: ${clientId},
 	proxyUrl: ${proxyUrl},
