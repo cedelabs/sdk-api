@@ -14,7 +14,7 @@
     ],
     "info": {
       "title": "Cede SDK API",
-      "version": "1.0.0+sdk2.16.2"
+      "version": "1.1.0_sdk2.16.2"
     }
   },
   "routes": {

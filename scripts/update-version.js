@@ -13,7 +13,7 @@ const packageJson = JSON.parse(
 const sdkPackageJson = JSON.parse(
   fs.readFileSync(new URL('../node_modules/@cedelabs-private/sdk/package.json', import.meta.url))
 );
-const version = `${packageJson.version}+sdk${sdkPackageJson.version}`;
+const version = `${packageJson.version}_sdk${sdkPackageJson.version}`;
 
 // Update tsoa.json with version
 const tsoaPath = path.join(__dirname, '../tsoa.json');
