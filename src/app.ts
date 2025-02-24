@@ -15,7 +15,7 @@ import { version as sdkVersion } from '@cedelabs-private/sdk';
 
 const __dirname = path.resolve();
 
-export const VERSION = `${apiVersion}+sdk${sdkVersion}`;
+export const VERSION = `${apiVersion}_sdk${sdkVersion}`;
 
 export async function sdkApi(configuration: SdkApiConfiguration) {
   const sdk = await setupCedeSdk(configuration);

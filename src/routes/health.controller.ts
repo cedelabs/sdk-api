@@ -2,8 +2,7 @@ import { Router } from 'express';
 import { Controller, Get, Response, Route, Tags } from 'tsoa';
 import { version as apiVersion } from '../../package.json';
 import { version as sdkVersion } from '@cedelabs-private/sdk';
-export const VERSION = `${apiVersion}+sdk${sdkVersion}`;
-
+import { VERSION } from '../app';
 interface HealthResponse {
   status: 'ok';
   timestamp: string;
