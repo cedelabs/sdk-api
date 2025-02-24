@@ -19,11 +19,6 @@ jobs:
         with:
           ref: ${{ github.event.inputs.sha }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
       - name: Read versions from package.json
         id: versions
         run: |
