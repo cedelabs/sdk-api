@@ -9,7 +9,8 @@ import { subAccountRoutes } from './subAccount.controller';
 import { tokensRoutes } from './tokens.controller';
 import { tradeRoutes } from './trade.controller';
 import { withdrawalRoutes } from './withdrawal.controller';
-
+import { healthRoutes } from './health.controller';
+import { transferRoutes } from './transfer.controller';
 export function setupRoutes(sdk: any) {
     const router = Router();
   
@@ -22,7 +23,9 @@ export function setupRoutes(sdk: any) {
     router.use('/prices', pricesRoutes(sdk));
     router.use('/trade', tradeRoutes(sdk));
     router.use('/tokens', tokensRoutes(sdk));
-     router.use('/subAccount', subAccountRoutes(sdk));
+    router.use('/subAccount', subAccountRoutes(sdk));
+    router.use('/transfer', transferRoutes(sdk));
+    router.use('/health', healthRoutes());
    
     return router;
   }

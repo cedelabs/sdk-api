@@ -22,7 +22,6 @@ type PrepareWithdrawalResponse = ReturnType<CedeSDK['api']['prepareWithdrawal']>
 type GetWithdrawalFeeResponse = ReturnType<CedeSDK['api']['getWithdrawalFee']>;
 type CheckAddressIsWhitelistedResponse = ReturnType<CedeSDK['api']['checkAddressIsWhitelisted']>;
 type GetWhitelistedAddressesResponse = ReturnType<CedeSDK['api']['getWhitelistedAddresses']>;
-type GetKrakenWithdrawalMethodsResponse = ReturnType<CedeSDK['api']['getKrakenWithdrawalMethods']>;
 type CreateWithdrawalResponse = ReturnType<CedeSDK['api']['createWithdrawal']>;
 interface GetWithdrawalFeeParams {
   tokenSymbol: string;
@@ -131,8 +130,7 @@ export class WithdrawalController extends Controller {
   }
 
   /**
-   * Get withdrawal fee.
-   * Calculates the network fee for a withdrawal transaction.
+   * Get the network fee for a withdrawal transaction.
    * Fee varies based on token, network, and amount.
    */
   @Get('fee')
@@ -157,9 +155,8 @@ export class WithdrawalController extends Controller {
   }
 
   /**
-   * Check if address is whitelisted.
-   * Verifies if a withdrawal address is in the exchange's whitelist.
-   * Required for exchanges with mandatory address whitelisting.
+   * Check if a withdrawal address is in the exchange's whitelist.
+   * Most of the exchanges require the withdrawal address to be whitelisted.
    */
   @Get('whitelisted-addresses/check')
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -206,32 +203,7 @@ export class WithdrawalController extends Controller {
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetWhitelistedAddressesResponse> {
     return await this.sdk.api.getWhitelistedAddresses({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
-  }
-
-  /**
-   * Get Kraken withdrawal methods.
-   * Retrieves available withdrawal methods specific to Kraken exchange.
-   * Includes method IDs and associated fees.
-   */
-  @Get('kraken-methods')
-  @Response<ErrorResponse>(401, 'Unauthorized')
-  @Response<ErrorResponse>(403, 'Forbidden')
-  @Response<ErrorResponse>(400, 'Bad Request')
-  @Response<ErrorResponse>(404, 'Not Found')
-  @Response<ErrorResponse>(408, 'Request Timeout')
-  @Response<ErrorResponse>(429, 'Too Many Requests')
-  @Response<ErrorResponse>(500, 'Internal Server Error')
-  @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async getKrakenWithdrawalMethods(
-    @Header('x-exchange-id') exchangeId: string,
-    @Header('x-exchange-instance-id') exchangeInstanceId: string,
-    @Header('x-exchange-api-key') apiKey: string,
-    @Header('x-exchange-api-secret') secretKey: string,
-    @Header('x-exchange-api-password') password?: string,
-    @Header('x-exchange-api-uid') uid?: string,
-  ): Promise<GetKrakenWithdrawalMethodsResponse> {
-    return await this.sdk.api.getKrakenWithdrawalMethods({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid } });
-  }
+  } 
 }
 
 export function withdrawalRoutes(sdk: any) {
@@ -309,19 +281,6 @@ export function withdrawalRoutes(sdk: any) {
           tokenSymbol: req.query.tokenSymbol as string,
           network: req.query.network as string,
         },
-        auth.exchangeId,
-        auth.exchangeInstanceId,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
-  }));
-
-  router.get('/kraken-methods', errorHandler(async (req, res) => {
-    const auth = extractAuthFromHeaders(req);
-    const result = await controller.getKrakenWithdrawalMethods(
         auth.exchangeId,
         auth.exchangeInstanceId,
         auth.apiKey,

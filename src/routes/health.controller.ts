@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import { Controller, Get, Response, Route, Tags } from 'tsoa';
+import { version as apiVersion } from '../../package.json';
+import { version as sdkVersion } from '@cedelabs-private/sdk';
+export const VERSION = `${apiVersion}+sdk${sdkVersion}`;
 
 interface HealthResponse {
   status: 'ok';
   timestamp: string;
+  version: string;
+  apiVersion: string;
+  sdkVersion: string;
 }
 
 @Route('health')
@@ -19,6 +25,9 @@ export class HealthController extends Controller {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
+      version: VERSION,
+      apiVersion,
+      sdkVersion,
     };
   }
 }
@@ -32,7 +41,10 @@ export function healthRoutes() {
       .then((response) => res.json(response))
       .catch(() => res.status(503).json({ 
         status: 'error',
-        timestamp: new Date().toISOString() 
+        timestamp: new Date().toISOString(),
+        version: VERSION,
+        apiVersion,
+        sdkVersion,
       }));
   });
 

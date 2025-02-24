@@ -16,9 +16,9 @@ export class ExchangeController extends Controller {
   }
 
   /**
-   * Get supported exchanges.
-   * Retrieves a list of all supported cryptocurrency exchanges.
-   * Includes information about exchange features and capabilities.
+   * Get supported exchanges and their specific features. For example, 
+   * which exchanges support deposits/withdrawals, which unified wallets are supported,
+   * which exchanges require a password in addition to the public/secret api keys, etc.
    */
   @Get('supported')
   @Response<ErrorResponse>(400, 'Bad Request')
@@ -31,10 +31,12 @@ export class ExchangeController extends Controller {
     return await this.sdk.api.getSupportedExchanges();
   }
 
-  /**
-   * Get exchange status.
-   * Retrieves current operational status of the exchange.
+  /** 
+   * Get current operational status of the exchange by querying the exchange directly.
    * Includes information about trading, deposits, and withdrawals availability.
+   * 
+   * Note: Cede public data API polls exchanges periodically to get the latest status. You can either 
+   * use the status data provided by the public API in `/supported` endpoint or use this endpoint to get the latest status.
    */
   @Get('status')
   @Response<ErrorResponse>(401, 'Unauthorized')

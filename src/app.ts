@@ -10,8 +10,12 @@ import { setupCedeSdk } from "./utils/sdk";
 import { logger } from './services/logger';
 import { metricsMiddleware } from './middleware/metricsMiddleware';
 import { MetricsService } from './services/metrics';
+import { version as apiVersion } from '../package.json';
+import { version as sdkVersion } from '@cedelabs-private/sdk';
 
 const __dirname = path.resolve();
+
+export const VERSION = `${apiVersion}+sdk${sdkVersion}`;
 
 export async function sdkApi(configuration: SdkApiConfiguration) {
   const sdk = await setupCedeSdk(configuration);
@@ -36,8 +40,6 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
       process.exit(1);
     });
   }
-
-  app.use('/health', healthRoutes());
   
   app.use(bodyParser.json());
 
@@ -56,14 +58,14 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
       apiSpec: join(__dirname, '/dist/swagger.json'),
       validateRequests: true,
       validateResponses: true,
-      ignorePaths: /^\/health/,
+      ignorePaths: /^\/api\/v1\/health/,
     }),
   );
   
   const auth = configuration.authentication;
   if (auth) {
     app.use(async (req, res, next) => {
-      if (req.path.startsWith('/health')) {
+      if (req.path.startsWith('/api/v1/health')) {
         return next();
       }
 
@@ -89,7 +91,7 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   }
 
   app.use((req, res, next) => {
-    if (req.path.startsWith('/health') || req.path.startsWith('/metrics')) {
+    if (req.path.startsWith('/metrics')) {
       return next();
     }
     metricsMiddleware()(req, res, next);
@@ -107,7 +109,7 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
     } catch (error) {
       res.status(500).send('Error collecting metrics');
     }
-  });
+  }); 
 
   app.use(globalErrorHandler);
 

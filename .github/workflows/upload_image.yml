@@ -7,31 +7,27 @@ on:
         description: "Github Commit Hash"
         required: true
         type: string
-      sdk_version:
-        description: "SDK Version (e.g. 2.9.0)"
-        required: true
-        type: string
-
-env:
-  AWS_REGION: eu-west-1 # to retrieve the SDK from AWS CodeArtifact
-  GCP_ACR_REGISTRY: ${{ vars.GCP_ACR_REGISTRY }}
-  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-  GCP_ACR_REPOSITORY: ${{ vars.GCP_ACR_REPOSITORY }}
-  GCP_ACR_IMAGE_NAME: ${{ vars.GCP_ACR_IMAGE_NAME }}-sdk_v${{ github.event.inputs.sdk_version }}
-
-permissions:
-  contents: read
 
 jobs:
   build-and-deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.sha || github.sha }}
+          ref: ${{ github.event.inputs.sha }}
+
+      - name: Read versions from package.json
+        id: versions
+        run: |
+          API_VERSION=$(node -p "require('./package.json').version")
+          SDK_VERSION=$(node -p "require('./node_modules/@cedelabs-private/sdk/package.json').version")
+          VERSION="${API_VERSION}+sdk${SDK_VERSION}"
+          echo "api_version=${API_VERSION}" >> $GITHUB_OUTPUT
+          echo "sdk_version=${SDK_VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Configure GCP credentials
         uses: google-github-actions/auth@v2
@@ -43,9 +39,8 @@ jobs:
         with:
           version: '>= 363.0.0'
 
-      
       - name: Login to GCP Artifact registry
-        run: gcloud auth configure-docker ${{ env.GCP_ACR_REGISTRY }}
+        run: gcloud auth configure-docker ${{ vars.GCP_ACR_REGISTRY }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -66,10 +61,34 @@ jobs:
           build-args: |
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            API_VERSION=${{ steps.versions.outputs.api_version }}
+            SDK_VERSION=${{ steps.versions.outputs.sdk_version }}
           tags: |
-            ${{ env.GCP_ACR_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ACR_REPOSITORY }}/${{ env.GCP_ACR_IMAGE_NAME }}:${{ github.sha }}
-            ${{ env.GCP_ACR_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ACR_REPOSITORY }}/${{ env.GCP_ACR_IMAGE_NAME }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: false
-          platforms: linux/amd64
+            ${{ vars.GCP_ACR_REGISTRY }}/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_ACR_REPOSITORY }}/${{ vars.GCP_ACR_IMAGE_NAME }}-v${{ steps.versions.outputs.version }}:${{ github.sha }}
+            ${{ vars.GCP_ACR_REGISTRY }}/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_ACR_REPOSITORY }}/${{ vars.GCP_ACR_IMAGE_NAME }}-v${{ steps.versions.outputs.version }}:latest
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.versions.outputs.version }}
+          release_name: Release v${{ steps.versions.outputs.version }}
+          body: |
+            SDK-API Version: ${{ steps.versions.outputs.api_version }}
+            SDK Version: ${{ steps.versions.outputs.sdk_version }}
+            
+            Docker Image: ${{ vars.GCP_ACR_REGISTRY }}/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_ACR_REPOSITORY }}/${{ vars.GCP_ACR_IMAGE_NAME }}-v${{ steps.versions.outputs.version }}:${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Swagger Documentation
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./docs/swagger.json
+          asset_name: swagger.json
+          asset_content_type: application/json

@@ -28,8 +28,10 @@ export class DepositController extends Controller {
   }
 
   /**
-   * Get deposit address for a token.
    * Retrieves the deposit address for a specific token and network on an exchange.
+   * 
+   * The SDK returns the deposit address provided by the exchange, it's unique
+   * for each user.
    */
   @Get('address')
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -63,7 +65,7 @@ export class DepositController extends Controller {
   }
 
   /**
-   * Retrieve deposit information
+   * Retrieve deposit information by the tx hash. 
    */
   @Get('retrieve')
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -94,24 +96,10 @@ export class DepositController extends Controller {
    * Handle deposit event.
    * Monitors for deposit completion and triggers webhook when detected.
    * 
-   * @example
-   * ```typescript
-   * // Example with callback headers for webhook authentication
-   * await api.deposit.onDeposit({
-   *   webhook: "https://your-server.com/webhook",
-   *   callbackHeaders: {
-   *     "Authorization": "Bearer your-secret-token",
-   *     "X-Custom-Header": "custom-value"
-   *   }
-   * })
-   * ```
-   * 
-   * @description
    * The callbackHeaders parameter allows you to specify custom headers that will be included
    * in every webhook request. This is particularly useful for:
-   * - Adding authentication tokens to secure webhook endpoints
+   * - Adding authentication tokens to secure webhook endpoint
    * - Including custom tracking or correlation IDs
-   * - Setting up webhook signature verification
    * 
    * When the service detects a deposit, it will make a POST request to your webhook URL
    * including these headers in the request.
@@ -142,9 +130,10 @@ export class DepositController extends Controller {
   }
 
   /**
-   * Get depositable tokens.
-   * Retrieves all tokens that can be deposited on the exchange.
-   * The response includes network information and deposit status for each token.
+   * Get all tokens that can be deposited on the exchange.
+   * The response includes network information for most of the exchanges allowing
+   * to retrieve it without querying per token. For the exchanges that don't 
+   * networks in depositable tokens, please use `/networks` endpoint with `toDeposit: true` flag.
    */
   @Get('tokens')
   @Response<ErrorResponse>(401, 'Unauthorized')

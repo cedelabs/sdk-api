@@ -21,7 +21,7 @@ export class SubAccountController extends Controller {
   }
 
   /**
-   * Get all sub accounts
+   * Get all sub accounts of the master account. The response is an array of sub-account UIDs.
    */
   @Get()
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -53,9 +53,7 @@ export class SubAccountController extends Controller {
   }
 
   /**
-   * Get sub account balances
-   * @summary Retrieves the balances for a specific sub account
-   * @remarks Make sure to URI encode the uid parameter to handle special characters properly
+   * Get sub account balances for a specific sub account UID.
    */
   @Get('balances')
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -79,7 +77,7 @@ export class SubAccountController extends Controller {
   }
 
   /**
-   * Transfer between sub accounts
+   * Transfer funds between sub-account and master account.
    */
   @Post('transfer')
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -117,12 +115,12 @@ export function subAccountRoutes(sdk: CedeSDK) {
     const uid = req.query.uid as string;
     const decodedUid = decodeURIComponent(uid);
     const result = await controller.getSubAccountBalances(
-        decodedUid,
-        auth.exchangeInstanceId,
-        auth.exchangeId,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
+      decodedUid,
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
       auth.uid,
     );
     res.json(result);

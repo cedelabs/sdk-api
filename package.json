@@ -5,13 +5,13 @@
 	"license": "MIT",
 	"type": "module",
 	"scripts": {
-		"dev": "tsoa spec && tsoa routes && tsx watch src/index",
-		"build": "tsoa spec && tsoa routes && npx pkgroll",
+		"dev": "tsoa spec && tsoa routes && copyfiles -u 1 \"docs/**/*\" dist && tsx watch src/index",
+		"build": "node scripts/update-version.js && tsoa spec && tsoa routes && copyfiles -u 1 \"docs/**/*\" dist && npx pkgroll",
 		"start": "node dist/index.js",
 		"test": "vitest"
 	},
 	"dependencies": {
-		"@cedelabs-private/sdk": "2.15.0",
+		"@cedelabs-private/sdk": "2.16.2",
 		"body-parser": "^1.20.3",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
@@ -26,8 +26,10 @@
 		"winston": "^3.17.0"
 	},
 	"devDependencies": {
+		"@types/body-parser": "^1.19.5",
 		"@types/express": "^4.17.21",
 		"@types/node": "^22.5.5",
+		"copyfiles": "^2.4.1",
 		"pkgroll": "^2.5.0",
 		"tsx": "^4.19.1",
 		"typescript": "^5.6.2",
@@ -36,5 +38,6 @@
 	"volta": {
 		"node": "23.3.0",
 		"yarn": "1.22.19"
-	}
+	},
+	"packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

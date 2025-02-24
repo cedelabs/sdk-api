@@ -6,7 +6,8 @@ import { ErrorResponse } from '../types';
 import { extractAuthFromHeaders } from '../utils/auth';
 type GetWithdrawableBalancesResponse = ReturnType<CedeSDK['api']['getWithdrawableBalances']>;
 type GetBalancesResponse = ReturnType<CedeSDK['api']['getBalances']>;
-
+type GetMainSubAccountsBalancesWithTokensResponse = ReturnType<CedeSDK['api']['getMainSubAccountsBalancesWithTokens']>;
+type GetBalancesWithTokensResponse = ReturnType<CedeSDK['api']['getBalancesWithTokens']>;
 @Route('portfolio')
 @Tags('Portfolio')
 export class PortfolioController extends Controller {
@@ -16,7 +17,11 @@ export class PortfolioController extends Controller {
 
   /**
    * Get withdrawable balances for an exchange.
-   * Retrieves balances that can be withdrawn from the exchange.
+   * Retrieves balances from a wallet used to initiate withdrawals.
+   * 
+   * If you have funds on other wallets, you'll first need to transfer these funds to the withdrawal wallet:
+   * - you can retrieve withdrawal wallets using `/supported` endpoint (`sendWalletTypes` field)
+   * 
    * The response includes balances grouped by wallet type.
    */
   @Get('withdrawable-balances')
@@ -81,6 +86,73 @@ export class PortfolioController extends Controller {
       },
     });
   }
+
+  /**
+   * Get all balances with token metadata for an exchange.
+   * Retrieves all balances across different wallet types and provides token metadata (e.g. token icon, contract address if available, etc.).
+   */
+  @Get('balances-with-tokens')
+  @Response<ErrorResponse>(401, 'Unauthorized')
+  @Response<ErrorResponse>(403, 'Forbidden')
+  @Response<ErrorResponse>(400, 'Bad Request')
+  @Response<ErrorResponse>(404, 'Not Found')
+  @Response<ErrorResponse>(408, 'Request Timeout')
+  @Response<ErrorResponse>(429, 'Too Many Requests')
+  @Response<ErrorResponse>(500, 'Internal Server Error')
+  @Response<ErrorResponse>(503, 'Service Unavailable')
+  public async getBalancesWithTokens(
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
+    @Header('x-exchange-api-key') apiKey: string,
+    @Header('x-exchange-api-secret') secretKey: string,
+    @Header('x-exchange-api-password') password?: string,
+    @Header('x-exchange-api-uid') uid?: string
+  ): Promise<GetBalancesWithTokensResponse> {
+    return await this.sdk.api.getBalancesWithTokens({
+      exchangeInstanceId,
+      auth: {
+        exchangeId,
+        apiKey,
+        secretKey,
+        password,
+        uid,
+      },
+    });
+  }
+
+
+   /**
+   * Get all main and sub accounts balances with token metadata for an exchange.
+   * Retrieves all balances across different wallet types and provides token metadata (e.g. token icon, contract address if available, etc.).
+   */
+   @Get('main-sub-accounts-balances-with-tokens')
+   @Response<ErrorResponse>(401, 'Unauthorized')
+   @Response<ErrorResponse>(403, 'Forbidden')
+   @Response<ErrorResponse>(400, 'Bad Request')
+   @Response<ErrorResponse>(404, 'Not Found')
+   @Response<ErrorResponse>(408, 'Request Timeout')
+   @Response<ErrorResponse>(429, 'Too Many Requests')
+   @Response<ErrorResponse>(500, 'Internal Server Error')
+   @Response<ErrorResponse>(503, 'Service Unavailable')
+   public async getMainSubAccountsBalancesWithTokens(
+     @Header('x-exchange-instance-id') exchangeInstanceId: string,
+     @Header('x-exchange-id') exchangeId: string,
+     @Header('x-exchange-api-key') apiKey: string,
+     @Header('x-exchange-api-secret') secretKey: string,
+     @Header('x-exchange-api-password') password?: string,
+     @Header('x-exchange-api-uid') uid?: string
+   ): Promise<GetMainSubAccountsBalancesWithTokensResponse> {
+     return await this.sdk.api.getMainSubAccountsBalancesWithTokens({
+       exchangeInstanceId,
+       auth: {
+         exchangeId,
+         apiKey,
+         secretKey,
+         password,
+         uid,
+       },
+     });
+   }
 }
 
 export function portfolioRoutes(sdk: CedeSDK) {
@@ -108,6 +180,32 @@ export function portfolioRoutes(sdk: CedeSDK) {
       auth.apiKey,
       auth.secretKey,
         auth.password,
+      auth.uid
+    );
+    res.json(result);
+  }));
+
+  router.get('/balances-with-tokens', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getBalancesWithTokens(
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid
+    );
+    res.json(result);
+  }));
+
+  router.get('/main-sub-accounts-balances-with-tokens', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getMainSubAccountsBalancesWithTokens(
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
       auth.uid
     );
     res.json(result);
