@@ -4,10 +4,10 @@ import { Controller, Get, Header, Response, Route, Tags } from 'tsoa';
 import { errorHandler } from '../middleware/errorHandler';
 import { ErrorResponse } from '../types';
 import { extractAuthFromHeaders } from '../utils/auth';
-type GetWithdrawableBalancesResponse = ReturnType<CedeSDK['api']['getWithdrawableBalances']>;
-type GetBalancesResponse = ReturnType<CedeSDK['api']['getBalances']>;
-type GetMainSubAccountsBalancesWithTokensResponse = ReturnType<CedeSDK['api']['getMainSubAccountsBalancesWithTokens']>;
-type GetBalancesWithTokensResponse = ReturnType<CedeSDK['api']['getBalancesWithTokens']>;
+type GetWithdrawableBalancesResponseV2 = ReturnType<CedeSDK['api']['getWithdrawableBalancesV2']>;
+type GetBalancesResponseV2 = ReturnType<CedeSDK['api']['getBalancesV2']>;
+type GetMainSubAccountsBalancesWithTokensResponseV2 = ReturnType<CedeSDK['api']['getMainSubAccountsBalancesWithTokensV2']>;
+type GetBalancesWithTokensResponseV2 = ReturnType<CedeSDK['api']['getBalancesWithTokensV2']>;
 @Route('portfolio')
 @Tags('Portfolio')
 export class PortfolioController extends Controller {
@@ -40,8 +40,8 @@ export class PortfolioController extends Controller {
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string
-  ): Promise<GetWithdrawableBalancesResponse> {
-    return await this.sdk.api.getWithdrawableBalances({
+  ): Promise<GetWithdrawableBalancesResponseV2> {
+    return await this.sdk.api.getWithdrawableBalancesV2({
       exchangeInstanceId,
       auth: {
         exchangeId,
@@ -74,8 +74,8 @@ export class PortfolioController extends Controller {
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string
-  ): Promise<GetBalancesResponse> {
-    return await this.sdk.api.getBalances({
+  ): Promise<GetBalancesResponseV2> {
+    return await this.sdk.api.getBalancesV2({
       exchangeInstanceId,
       auth: {
         exchangeId,
@@ -107,8 +107,8 @@ export class PortfolioController extends Controller {
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string
-  ): Promise<GetBalancesWithTokensResponse> {
-    return await this.sdk.api.getBalancesWithTokens({
+  ): Promise<GetBalancesWithTokensResponseV2> {
+    return await this.sdk.api.getBalancesWithTokensV2({
       exchangeInstanceId,
       auth: {
         exchangeId,
@@ -141,8 +141,8 @@ export class PortfolioController extends Controller {
      @Header('x-exchange-api-secret') secretKey: string,
      @Header('x-exchange-api-password') password?: string,
      @Header('x-exchange-api-uid') uid?: string
-   ): Promise<GetMainSubAccountsBalancesWithTokensResponse> {
-     return await this.sdk.api.getMainSubAccountsBalancesWithTokens({
+   ): Promise<GetMainSubAccountsBalancesWithTokensResponseV2> {
+     return await this.sdk.api.getMainSubAccountsBalancesWithTokensV2({
        exchangeInstanceId,
        auth: {
          exchangeId,

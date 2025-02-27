@@ -7,7 +7,7 @@ import { extractAuthFromHeaders } from '../utils/auth';
 import { AuthParams } from '../utils/typeUtils';
 
 type GetSubAccountsResponse = ReturnType<CedeSDK['api']['getSubAccounts']>;
-type GetSubAccountBalancesResponse = ReturnType<CedeSDK['api']['getSubAccountBalances']>;
+type GetSubAccountBalancesResponseV2 = ReturnType<CedeSDK['api']['getSubAccountBalancesV2']>;
 type SubAccountTransferParams =Omit<CedeSDKSubAccountTransferParams, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'exchange'> & {
   exchangeInstanceId: string;
   auth: AuthParams;
@@ -72,8 +72,8 @@ export class SubAccountController extends Controller {
     @Header('x-exchange-api-secret') secretKey: string,
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') authUid?: string,
-  ): Promise<GetSubAccountBalancesResponse> {
-    return await this.sdk.api.getSubAccountBalances({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid: authUid }, uid });
+  ): Promise<GetSubAccountBalancesResponseV2> {
+    return await this.sdk.api.getSubAccountBalancesV2({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid: authUid }, uid });
   }
 
   /**
