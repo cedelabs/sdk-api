@@ -493,6 +493,9 @@
 					"amount": {
 						"type": "number",
 						"format": "double"
+					},
+					"key": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -2838,6 +2841,14 @@
 						"schema": {
 							"format": "double",
 							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "key",
+						"required": false,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]

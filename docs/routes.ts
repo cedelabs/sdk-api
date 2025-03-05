@@ -206,6 +206,7 @@ const models: TsoaRoute.Models = {
             "tokenSymbol": {"dataType":"string","required":true},
             "network": {"dataType":"string","required":true},
             "amount": {"dataType":"double","required":true},
+            "key": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
