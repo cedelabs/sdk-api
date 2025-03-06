@@ -162,7 +162,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tokenSymbol":{"dataType":"string","required":true},"amount":{"dataType":"double","required":true},"address":{"dataType":"string"},"network":{"dataType":"string"},"isInternalTransfer":{"dataType":"boolean"}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tokenSymbol":{"dataType":"string","required":true},"amount":{"dataType":"double","required":true},"address":{"dataType":"string"},"network":{"dataType":"string","required":true},"isInternalTransfer":{"dataType":"boolean"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange_": {

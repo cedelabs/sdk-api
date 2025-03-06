@@ -428,7 +428,8 @@
 				},
 				"required": [
 					"tokenSymbol",
-					"amount"
+					"amount",
+					"network"
 				],
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
@@ -2256,7 +2257,7 @@
 	},
 	"info": {
 		"title": "@cedelabs/sdk-http-api",
-		"version": "1.2.0",
+		"version": "1.2.1",
 		"license": {
 			"name": "MIT"
 		},
