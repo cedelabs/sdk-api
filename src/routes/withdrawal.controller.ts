@@ -12,13 +12,17 @@ import { AuthParams } from '../utils/typeUtils';
  */
 
 type GetWithdrawalByIdResponse = ReturnType<CedeSDK['api']['getWithdrawalById']>;
-type PrepareWithdrawalParams = Omit<OriginalPrepareWithdrawalParams, 'fromExchange' | 'toExchange' | 'readonlyExchange'> & {
+type PrepareWithdrawalParams = Omit<OriginalPrepareWithdrawalParams, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'amount'> & {
   auth: AuthParams;
+  amount: string;
 };
-type CreateWithdrawalParams = Omit<OriginalCreateWithdrawalParams, 'fromExchange' | 'toExchange' | 'readonlyExchange'> & {
+type CreateWithdrawalParams = Omit<OriginalCreateWithdrawalParams, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'amount'> & {
   auth: AuthParams;
+  amount: string;
 };
-type PrepareWithdrawalResponse = ReturnType<CedeSDK['api']['prepareWithdrawal']>;
+type PrepareWithdrawalResponse = {
+  isValid: boolean;
+};
 type GetWithdrawalFeeResponse = ReturnType<CedeSDK['api']['getWithdrawalFee']>;
 type CheckAddressIsWhitelistedResponse = ReturnType<CedeSDK['api']['checkAddressIsWhitelisted']>;
 type GetWhitelistedAddressesResponse = ReturnType<CedeSDK['api']['getWhitelistedAddresses']>;
@@ -103,6 +107,7 @@ export class WithdrawalController extends Controller {
   public async createWithdrawal(@Body() params: CreateWithdrawalParams): Promise<CreateWithdrawalResponse> {
     const createWithdrawalParams = {
       ...params,
+      amount: Number(params.amount),
       fromExchangeInstanceId: params.auth.exchangeInstanceId,
     };
     return await this.sdk.api.createWithdrawal(createWithdrawalParams);
@@ -125,9 +130,13 @@ export class WithdrawalController extends Controller {
   public async prepareWithdrawal(@Body() params: PrepareWithdrawalParams): Promise<PrepareWithdrawalResponse> {
     const prepareWithdrawalParams = {
       ...params,
+      amount: Number(params.amount),
       fromExchangeInstanceId: params.auth.exchangeInstanceId,
     };
-    return await this.sdk.api.prepareWithdrawal(prepareWithdrawalParams);
+    await this.sdk.api.prepareWithdrawal(prepareWithdrawalParams);
+    return {
+      isValid: true,
+    }
   }
 
   /**
