@@ -130,14 +130,14 @@ const models: TsoaRoute.Models = {
         "type": {"ref":"ReturnType_CedeSDK-at-api_91_createWithdrawal_93__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_OriginalCreateWithdrawalParams.Exclude_keyofOriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange__": {
+    "Pick_OriginalCreateWithdrawalParams.Exclude_keyofOriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tokenSymbol":{"dataType":"string","required":true},"amount":{"dataType":"double","required":true},"address":{"dataType":"string"},"network":{"dataType":"string","required":true},"totpCode":{"dataType":"string"},"withdrawalTag":{"dataType":"string"},"clientTxId":{"dataType":"string"},"isInternalTransfer":{"dataType":"boolean"}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tokenSymbol":{"dataType":"string","required":true},"address":{"dataType":"string"},"network":{"dataType":"string","required":true},"totpCode":{"dataType":"string"},"withdrawalTag":{"dataType":"string"},"clientTxId":{"dataType":"string"},"isInternalTransfer":{"dataType":"boolean"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_OriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange_": {
+    "Omit_OriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_": {
         "dataType": "refAlias",
-        "type": {"ref":"Pick_OriginalCreateWithdrawalParams.Exclude_keyofOriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange__","validators":{}},
+        "type": {"ref":"Pick_OriginalCreateWithdrawalParams.Exclude_keyofOriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AuthParams": {
@@ -147,32 +147,27 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateWithdrawalParams": {
         "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_OriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ReturnType_CedeSDK-at-api_91_prepareWithdrawal_93__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"void","validators":{}},
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_OriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"amount":{"dataType":"string","required":true},"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PrepareWithdrawalResponse": {
         "dataType": "refAlias",
-        "type": {"ref":"ReturnType_CedeSDK-at-api_91_prepareWithdrawal_93__","validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"isValid":{"dataType":"boolean","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange__": {
+    "Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tokenSymbol":{"dataType":"string","required":true},"amount":{"dataType":"double","required":true},"address":{"dataType":"string"},"network":{"dataType":"string","required":true},"isInternalTransfer":{"dataType":"boolean"}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tokenSymbol":{"dataType":"string","required":true},"address":{"dataType":"string"},"network":{"dataType":"string","required":true},"isInternalTransfer":{"dataType":"boolean"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange_": {
+    "Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_": {
         "dataType": "refAlias",
-        "type": {"ref":"Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange__","validators":{}},
+        "type": {"ref":"Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PrepareWithdrawalParams": {
         "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"amount":{"dataType":"string","required":true},"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_Partial_Fee_2_.Exclude_keyofPartial_Fee_2_.refAmount__": {
@@ -421,7 +416,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PrepareOrderParams": {
         "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_PrepareOrderParamsType.fromExchange-or-toExchange-or-readonlyExchange-or-exchange_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"exchangeInstanceId":{"dataType":"string","required":true},"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_PrepareOrderParamsType.fromExchange-or-toExchange-or-readonlyExchange-or-exchange_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "OrderId": {
@@ -471,7 +466,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateOrderParams": {
         "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_CreateOrderParamsType.fromExchange-or-toExchange-or-readonlyExchange-or-exchange_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"exchangeInstanceId":{"dataType":"string","required":true},"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_CreateOrderParamsType.fromExchange-or-toExchange-or-readonlyExchange-or-exchange_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ReturnType_CedeSDK-at-api_91_getOrder_93__": {
@@ -496,7 +491,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateOrderParams": {
         "dataType": "refAlias",
-        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_UpdateOrderParamsType.exchange-or-orderId_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"exchangeInstanceId":{"dataType":"string","required":true},"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
+        "type": {"dataType":"intersection","subSchemas":[{"ref":"Omit_UpdateOrderParamsType.exchange-or-orderId_"},{"dataType":"nestedObjectLiteral","nestedProperties":{"auth":{"ref":"AuthParams","required":true}}}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CancelOrderStatus": {

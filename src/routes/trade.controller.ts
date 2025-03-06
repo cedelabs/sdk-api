@@ -14,15 +14,12 @@ import { AuthParams } from '../utils/typeUtils';
 
 type PrepareOrderParams = Omit<PrepareOrderParamsType, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'exchange'> & {
   auth: AuthParams;
-  exchangeInstanceId: string;
 };
 type UpdateOrderParams = Omit<UpdateOrderParamsType, 'exchange' | 'orderId'> & {
   auth: AuthParams;
-  exchangeInstanceId: string;
 };
 type CreateOrderParams = Omit<CreateOrderParamsType, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'exchange'> & {
   auth: AuthParams;
-  exchangeInstanceId: string;
 };
 type GetMarketPairsResponse = ReturnType<CedeSDK['api']['getMarketPairs']>;
 type GetMarketRateResponse = ReturnType<CedeSDK['api']['getMarketRate']>;
@@ -150,7 +147,11 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
   public async prepareOrder(@Body() params: PrepareOrderParams): Promise<PrepareOrderResponse> {
-    return await this.sdk.api.prepareOrder(params);
+    const prepareOrderParams = {
+      ...params,
+      exchangeInstanceId: params.auth.exchangeInstanceId,
+    };
+    return await this.sdk.api.prepareOrder(prepareOrderParams);
   }
 
   /**
@@ -168,7 +169,11 @@ export class TradeController extends Controller {
   @Response<ErrorResponse>(503, 'Service Unavailable')
   @Response<ErrorResponse>(402, 'Insufficient balance')
   public async createOrder(@Body() params: CreateOrderParams): Promise<CreateOrderResponse> {
-    return await this.sdk.api.createOrder(params);
+    const createOrderParams = {
+      ...params,
+      exchangeInstanceId: params.auth.exchangeInstanceId,
+    };
+    return await this.sdk.api.createOrder(createOrderParams);
   }
 
   /**
@@ -215,7 +220,12 @@ export class TradeController extends Controller {
     @Path() orderId: string,    
     @Body() params: UpdateOrderParams
   ): Promise<GetOrderResponse> {
-    return await this.sdk.api.updateOrder({ orderId, ...params });
+    const updateOrderParams = {
+      ...params,
+      orderId,
+      exchangeInstanceId: params.auth.exchangeInstanceId,
+    };
+    return await this.sdk.api.updateOrder(updateOrderParams);
   }
 
   /**
