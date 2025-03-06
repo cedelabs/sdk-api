@@ -27,6 +27,7 @@ interface GetWithdrawalFeeParams {
   tokenSymbol: string;
   network: string;
   amount: number;
+  key?: string;
 }
 interface GetWhitelistedAddressesParams {
   tokenSymbol?: string;
@@ -151,7 +152,14 @@ export class WithdrawalController extends Controller {
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetWithdrawalFeeResponse> {
-    return await this.sdk.api.getWithdrawalFee({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
+    return await this.sdk.api.getWithdrawalFee({ 
+      exchangeInstanceId, 
+      auth: { exchangeId, apiKey, secretKey, password, uid }, 
+      ...params, 
+      opts: {
+        key: params.key,
+      } 
+    });
   }
 
   /**
@@ -210,22 +218,6 @@ export function withdrawalRoutes(sdk: any) {
   const router = Router();
   const controller = new WithdrawalController(sdk);
 
-  router.get('/:withdrawalId', errorHandler(async (req, res) => {
-    const auth = extractAuthFromHeaders(req);
-    const result = await controller.getWithdrawalById(
-      req.params.withdrawalId,
-      req.query.tokenSymbol as string,
-      Number(req.query.timestamp),
-      auth.exchangeInstanceId,
-      auth.exchangeId,
-      auth.apiKey,
-      auth.secretKey,
-      auth.password,
-      auth.uid
-      );
-    res.json(result);
-  }));
-
   router.post('/', errorHandler(async (req, res) => {
     const result = await controller.createWithdrawal(req.body);
     res.json(result);
@@ -244,6 +236,7 @@ export function withdrawalRoutes(sdk: any) {
           tokenSymbol: req.query.tokenSymbol as string,
           network: req.query.network as string,
           amount: Number(req.query.amount),
+          key: req.query.key as string,
         },
         auth.exchangeInstanceId,
         auth.exchangeId,
@@ -289,6 +282,22 @@ export function withdrawalRoutes(sdk: any) {
         auth.uid,
       );
       res.json(result);
+  }));
+
+  router.get('/:withdrawalId', errorHandler(async (req, res) => {
+    const auth = extractAuthFromHeaders(req);
+    const result = await controller.getWithdrawalById(
+      req.params.withdrawalId,
+      req.query.tokenSymbol as string,
+      Number(req.query.timestamp),
+      auth.exchangeInstanceId,
+      auth.exchangeId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid
+      );
+    res.json(result);
   }));
 
   return router;
