@@ -46,6 +46,11 @@ export type SdkApiConfiguration = {
 	 */
 	proxyUrl?: string;
 	/**
+	 * The number of unique IPs in your proxy pool. This is used to scale the rate limits for exchanges
+	 * that limit by IP (like Binance). Default is 1.
+	 */
+	ipPoolSize?: number;
+	/**
 	 * Verbose mode.
 	 * 
 	 * - `"vv"`: Prints all network requests/responses and logs.
