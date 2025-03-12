@@ -32,6 +32,7 @@ if (clientId === "" && env.MODE === "REAL") {
 }
 const secretApiKey = process.env.SECRET_API_KEY || "";
 const proxyUrl = process.env.PROXY_URL || "";
+const ipPoolSize = process.env.IP_POOL_SIZE ? parseInt(process.env.IP_POOL_SIZE) : 1;
 const verbose = process.env.VERBOSE as "vv" | "v" | undefined;
 
 logger.info(`SDK-API config: 
@@ -41,6 +42,7 @@ logger.info(`SDK-API config:
 	mode: ${env.MODE === "MOCK" ? "MOCK" : "REAL"},
 	clientId: ${clientId},
 	proxyUrl: ${proxyUrl},
+	ipPoolSize: ${ipPoolSize},
 	sdk-api authentication enabled: ${!secretApiKey ? "NO" : "YES"}
 	cache: ${getCache().constructor.name}
 	verbose: ${verbose ? "YES" : "NO"}
@@ -53,6 +55,7 @@ sdkApi({
 	clientId,
 	cache: getCache(),
 	proxyUrl,
+	ipPoolSize,
 	verbose,
 	authentication: !secretApiKey ? () => true : hmacAuthStrategyMiddleware({
 		secretKey: secretApiKey,

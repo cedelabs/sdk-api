@@ -386,7 +386,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateOrderRequest": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"metadata":{"dataType":"nestedObjectLiteral","nestedProperties":{"defiAddress":{"dataType":"string"},"tradeAndSend":{"dataType":"boolean"}}},"amount":{"dataType":"string","required":true},"price":{"dataType":"string","required":true},"orderType":{"ref":"OrderType","required":true},"orderSide":{"ref":"OrderSide","required":true},"pairSymbol":{"ref":"PairSymbol","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"metadata":{"dataType":"nestedObjectLiteral","nestedProperties":{"defiAddress":{"dataType":"string"},"tradeAndSend":{"dataType":"boolean"}}},"recaptchaToken":{"dataType":"string"},"amount":{"dataType":"string","required":true},"price":{"dataType":"string","required":true},"orderType":{"ref":"OrderType","required":true},"orderSide":{"ref":"OrderSide","required":true},"pairSymbol":{"ref":"PairSymbol","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PreparedOrder": {
@@ -456,7 +456,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_CreateOrderParamsType.Exclude_keyofCreateOrderParamsType.fromExchange-or-toExchange-or-readonlyExchange-or-exchange__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"amount":{"dataType":"string","required":true},"pairSymbol":{"dataType":"string","required":true},"orderSide":{"ref":"OrderSide","required":true},"price":{"dataType":"string","required":true},"orderType":{"ref":"OrderType","required":true},"metadata":{"dataType":"nestedObjectLiteral","nestedProperties":{"defiAddress":{"dataType":"string"},"tradeAndSend":{"dataType":"boolean"}}},"clientOrderId":{"dataType":"string"},"stp":{"ref":"OrderStpTypes"},"extraHeaders":{"ref":"Record_string.string_"}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"amount":{"dataType":"string","required":true},"pairSymbol":{"dataType":"string","required":true},"orderSide":{"ref":"OrderSide","required":true},"price":{"dataType":"string","required":true},"orderType":{"ref":"OrderType","required":true},"recaptchaToken":{"dataType":"string"},"metadata":{"dataType":"nestedObjectLiteral","nestedProperties":{"defiAddress":{"dataType":"string"},"tradeAndSend":{"dataType":"boolean"}}},"clientOrderId":{"dataType":"string"},"stp":{"ref":"OrderStpTypes"},"extraHeaders":{"ref":"Record_string.string_"}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_CreateOrderParamsType.fromExchange-or-toExchange-or-readonlyExchange-or-exchange_": {
