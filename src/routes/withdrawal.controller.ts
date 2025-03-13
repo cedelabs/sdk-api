@@ -24,7 +24,6 @@ type PrepareWithdrawalResponse = {
   isValid: boolean;
 };
 type GetWithdrawalFeeResponse = ReturnType<CedeSDK['api']['getWithdrawalFee']>;
-type CheckAddressIsWhitelistedResponse = ReturnType<CedeSDK['api']['checkAddressIsWhitelisted']>;
 type GetWhitelistedAddressesResponse = ReturnType<CedeSDK['api']['getWhitelistedAddresses']>;
 type CreateWithdrawalResponse = ReturnType<CedeSDK['api']['createWithdrawal']>;
 interface GetWithdrawalFeeParams {
@@ -37,16 +36,11 @@ interface GetWhitelistedAddressesParams {
   tokenSymbol?: string;
   network?: string;
 }
-interface CheckAddressIsWhitelistedParams {
-  address: string;
-  tokenSymbol: string;
-  key: string;
-}
 @Route('withdrawal')
 @Tags('Withdrawal')
 export class WithdrawalController extends Controller {
   constructor(private sdk: CedeSDK) {
-    super();    
+    super();
   }
 
   /**
@@ -93,6 +87,13 @@ export class WithdrawalController extends Controller {
    * Create a new withdrawal.
    * Initiates a withdrawal transaction from the exchange.
    * Requires proper authentication and withdrawal address verification.
+   * 
+   * To determine whether an exchange requires address whitelisting for withdrawals, check the `isRequiringAddressWhitelisting` field in the exchange information returned by 
+   * the `/supported` endpoint. 
+   * 
+   * For exchanges that support address whitelisting, retrieve the list of whitelisted addresses using the `/whitelisted-addresses` endpoint and verify 
+   * that the destination address is approved. This verification is particularly important when an exchange mandates address whitelisting for withdrawals.
+   * 
    */
   @Post()
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -161,45 +162,27 @@ export class WithdrawalController extends Controller {
     @Header('x-exchange-api-password') password?: string,
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetWithdrawalFeeResponse> {
-    return await this.sdk.api.getWithdrawalFee({ 
-      exchangeInstanceId, 
-      auth: { exchangeId, apiKey, secretKey, password, uid }, 
-      ...params, 
+    return await this.sdk.api.getWithdrawalFee({
+      exchangeInstanceId,
+      auth: { exchangeId, apiKey, secretKey, password, uid },
+      ...params,
       opts: {
         key: params.key,
-      } 
+      }
     });
-  }
-
-  /**
-   * Check if a withdrawal address is in the exchange's whitelist.
-   * Most of the exchanges require the withdrawal address to be whitelisted.
-   */
-  @Get('whitelisted-addresses/check')
-  @Response<ErrorResponse>(401, 'Unauthorized')
-  @Response<ErrorResponse>(403, 'Forbidden')
-  @Response<ErrorResponse>(400, 'Bad Request')
-  @Response<ErrorResponse>(404, 'Not Found')
-  @Response<ErrorResponse>(408, 'Request Timeout')
-  @Response<ErrorResponse>(429, 'Too Many Requests')
-  @Response<ErrorResponse>(500, 'Internal Server Error')
-  @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async checkAddressIsWhitelisted(
-    @Queries() params: CheckAddressIsWhitelistedParams,
-    @Header('x-exchange-instance-id') exchangeInstanceId: string,
-    @Header('x-exchange-id') exchangeId: string,
-    @Header('x-exchange-api-key') apiKey: string,
-    @Header('x-exchange-api-secret') secretKey: string,
-    @Header('x-exchange-api-password') password?: string,
-    @Header('x-exchange-api-uid') uid?: string,
-  ): Promise<CheckAddressIsWhitelistedResponse> {
-    return await this.sdk.api.checkAddressIsWhitelisted({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
   }
 
   /**
    * Get whitelisted addresses.
    * Retrieves all whitelisted withdrawal addresses for an exchange.
    * Can be filtered by token and network.
+   * 
+   * To know whether an exchange supports address whitelisting, check the `provideWhitelistedAddresses` field in the exchange information returned by 
+   * the `/supported` endpoint. 
+   * 
+   * To determine whether an exchange requires address whitelisting for withdrawals, check the `isRequiringAddressWhitelisting` field in the exchange information returned by 
+   * the `/supported` endpoint. 
+   * 
    */
   @Get('whitelisted-addresses')
   @Response<ErrorResponse>(401, 'Unauthorized')
@@ -220,7 +203,7 @@ export class WithdrawalController extends Controller {
     @Header('x-exchange-api-uid') uid?: string,
   ): Promise<GetWhitelistedAddressesResponse> {
     return await this.sdk.api.getWhitelistedAddresses({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid }, ...params });
-  } 
+  }
 }
 
 export function withdrawalRoutes(sdk: any) {
@@ -241,29 +224,10 @@ export function withdrawalRoutes(sdk: any) {
   router.get('/fee', errorHandler(async (req, res) => {
     const auth = extractAuthFromHeaders(req);
     const result = await controller.getWithdrawalFee(
-        {
-          tokenSymbol: req.query.tokenSymbol as string,
-          network: req.query.network as string,
-          amount: Number(req.query.amount),
-          key: req.query.key as string,
-        },
-        auth.exchangeInstanceId,
-        auth.exchangeId,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
-  }));
-
-
-  router.get('/whitelisted-addresses/check', errorHandler(async (req, res) => {
-    const auth = extractAuthFromHeaders(req);
-    const result = await controller.checkAddressIsWhitelisted(
       {
-        address: req.query.address as string,
         tokenSymbol: req.query.tokenSymbol as string,
+        network: req.query.network as string,
+        amount: Number(req.query.amount),
         key: req.query.key as string,
       },
       auth.exchangeInstanceId,
@@ -279,18 +243,18 @@ export function withdrawalRoutes(sdk: any) {
   router.get('/whitelisted-addresses', errorHandler(async (req, res) => {
     const auth = extractAuthFromHeaders(req);
     const result = await controller.getWhitelistedAddresses(
-        {
-          tokenSymbol: req.query.tokenSymbol as string,
-          network: req.query.network as string,
-        },
-        auth.exchangeId,
-        auth.exchangeInstanceId,
-        auth.apiKey,
-        auth.secretKey,
-        auth.password,
-        auth.uid,
-      );
-      res.json(result);
+      {
+        tokenSymbol: req.query.tokenSymbol as string,
+        network: req.query.network as string,
+      },
+      auth.exchangeId,
+      auth.exchangeInstanceId,
+      auth.apiKey,
+      auth.secretKey,
+      auth.password,
+      auth.uid,
+    );
+    res.json(result);
   }));
 
   router.get('/:withdrawalId', errorHandler(async (req, res) => {
@@ -305,7 +269,7 @@ export function withdrawalRoutes(sdk: any) {
       auth.secretKey,
       auth.password,
       auth.uid
-      );
+    );
     res.json(result);
   }));
 
