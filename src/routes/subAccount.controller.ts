@@ -9,7 +9,6 @@ import { AuthParams } from '../utils/typeUtils';
 type GetSubAccountsResponse = ReturnType<CedeSDK['api']['getSubAccounts']>;
 type GetSubAccountBalancesResponseV2 = ReturnType<CedeSDK['api']['getSubAccountBalancesV2']>;
 type SubAccountTransferParams =Omit<CedeSDKSubAccountTransferParams, 'fromExchange' | 'toExchange' | 'readonlyExchange' | 'exchange'> & {
-  exchangeInstanceId: string;
   auth: AuthParams;
 };
 
@@ -91,7 +90,11 @@ export class SubAccountController extends Controller {
   public async subAccountTransfer(
     @Body() params: SubAccountTransferParams,
   ): Promise<SubAccountTransferResponse> {
-    return await this.sdk.api.subAccountTransfer(params);
+    const subAccountTransferParams = {
+      ...params,
+      exchangeInstanceId: params.auth.exchangeInstanceId,
+    };
+    return await this.sdk.api.subAccountTransfer(subAccountTransferParams);
   }
 }
 

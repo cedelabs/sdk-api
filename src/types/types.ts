@@ -3,7 +3,6 @@ import { AuthParams } from "../utils/typeUtils";
 
 
 export type OnDepositParams = {
-    exchangeInstanceId: string;
     auth: AuthParams;   
     txHash: string;
     tokenSymbol: string;

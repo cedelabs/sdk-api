@@ -20,12 +20,42 @@ interface RetrieveDepositParams {
   tokenSymbol: string;
 }
 
+interface OnDepositResponse {
+  registered: boolean;
+}
+
 @Route('deposit')
 @Tags('Deposit')
 export class DepositController extends Controller {
   constructor(private sdk: CedeSDK) {
     super();
   }
+
+   /**
+   * Get all tokens that can be deposited on the exchange.
+   * The response includes network information for most of the exchanges allowing
+   * to retrieve it without querying per token. For the exchanges that don't 
+   * networks in depositable tokens, please use `/networks` endpoint with `toDeposit: true` flag.
+   */
+   @Get('tokens')
+   @Response<ErrorResponse>(401, 'Unauthorized')
+   @Response<ErrorResponse>(403, 'Forbidden')
+   @Response<ErrorResponse>(400, 'Bad Request')
+   @Response<ErrorResponse>(404, 'Not Found')
+   @Response<ErrorResponse>(408, 'Request Timeout')
+   @Response<ErrorResponse>(429, 'Too Many Requests')
+   @Response<ErrorResponse>(500, 'Internal Server Error')
+   @Response<ErrorResponse>(503, 'Service Unavailable')
+   public async getDepositableTokens(
+     @Header('x-exchange-instance-id') exchangeInstanceId: string,
+     @Header('x-exchange-id') exchangeId: string,
+     @Header('x-exchange-api-key') apiKey: string,
+     @Header('x-exchange-api-secret') secretKey: string,
+     @Header('x-exchange-api-password') password?: string,
+     @Header('x-exchange-api-uid') uid?: string,
+   ): Promise<GetDepositableTokensResponse> {
+     return await this.sdk.api.getDepositableTokens({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid } });
+   }
 
   /**
    * Retrieves the deposit address for a specific token and network on an exchange.
@@ -113,7 +143,7 @@ export class DepositController extends Controller {
   @Response<ErrorResponse>(429, 'Too Many Requests')
   @Response<ErrorResponse>(500, 'Internal Server Error')
   @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async onDeposit(@Body() params: OnDepositParams): Promise<void> {
+  public async onDeposit(@Body() params: OnDepositParams): Promise<OnDepositResponse> {
     const callback = async (tx: PureTransaction | null) => {
       try {
         await fetch(params.callbackUrl, {
@@ -126,34 +156,19 @@ export class DepositController extends Controller {
       }
     };
 
-    return await this.sdk.api.onDeposit({ ...params, callback });
+    const onDepositParams = {
+      ...params,
+      exchangeInstanceId: params.auth.exchangeInstanceId,
+      callback,
+    };
+
+    await this.sdk.api.onDeposit(onDepositParams);
+    return {
+      registered: true,
+    }
   }
 
-  /**
-   * Get all tokens that can be deposited on the exchange.
-   * The response includes network information for most of the exchanges allowing
-   * to retrieve it without querying per token. For the exchanges that don't 
-   * networks in depositable tokens, please use `/networks` endpoint with `toDeposit: true` flag.
-   */
-  @Get('tokens')
-  @Response<ErrorResponse>(401, 'Unauthorized')
-  @Response<ErrorResponse>(403, 'Forbidden')
-  @Response<ErrorResponse>(400, 'Bad Request')
-  @Response<ErrorResponse>(404, 'Not Found')
-  @Response<ErrorResponse>(408, 'Request Timeout')
-  @Response<ErrorResponse>(429, 'Too Many Requests')
-  @Response<ErrorResponse>(500, 'Internal Server Error')
-  @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async getDepositableTokens(
-    @Header('x-exchange-instance-id') exchangeInstanceId: string,
-    @Header('x-exchange-id') exchangeId: string,
-    @Header('x-exchange-api-key') apiKey: string,
-    @Header('x-exchange-api-secret') secretKey: string,
-    @Header('x-exchange-api-password') password?: string,
-    @Header('x-exchange-api-uid') uid?: string,
-  ): Promise<GetDepositableTokensResponse> {
-    return await this.sdk.api.getDepositableTokens({ exchangeInstanceId, auth: { exchangeId, apiKey, secretKey, password, uid } });
-  }
+ 
 }
 
 export function depositRoutes(sdk: CedeSDK) {

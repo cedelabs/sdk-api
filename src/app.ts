@@ -1,17 +1,17 @@
+import { version as sdkVersion } from '@cedelabs-private/sdk';
 import bodyParser from "body-parser";
 import express, { Express } from "express";
 import * as OpenApiValidator from 'express-openapi-validator';
 import path, { join } from "path";
+import { version as apiVersion } from '../package.json';
 import { globalErrorHandler } from './middleware/globalErrorHandler';
+import { metricsMiddleware } from './middleware/metricsMiddleware';
+import { injectMockValues } from './mock';
 import { setupRoutes } from "./routes";
-import { healthRoutes } from './routes/health.controller';
+import { logger } from './services/logger';
+import { MetricsService } from './services/metrics';
 import { SdkApiConfiguration } from "./types";
 import { setupCedeSdk } from "./utils/sdk";
-import { logger } from './services/logger';
-import { metricsMiddleware } from './middleware/metricsMiddleware';
-import { MetricsService } from './services/metrics';
-import { version as apiVersion } from '../package.json';
-import { version as sdkVersion } from '@cedelabs-private/sdk';
 
 const __dirname = path.resolve();
 
@@ -43,12 +43,24 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   
   app.use(bodyParser.json());
 
+  // Middleware to clean empty strings from query parameters
+  app.use((req, _res, next) => {
+    if (req.query) {
+      Object.keys(req.query).forEach(key => {
+        if (req.query[key] === '') {
+          delete req.query[key];
+        }
+      });
+    }
+    next();
+  });
+
   if (process.env.MODE === "MOCK") {
     app.use((req, _res, next) => {
-      req.headers['x-exchange-api-key'] = req.headers['x-exchange-api-key'] || 'demo-api-key';
-      req.headers['x-exchange-api-secret'] = req.headers['x-exchange-api-secret'] || 'demo-secret-key';
-      req.headers['x-exchange-api-password'] = req.headers['x-exchange-api-password'] || 'demo-password';
-      req.headers['x-exchange-api-uid'] = req.headers['x-exchange-api-uid'] || 'demo-uid';
+      logger.info(`Processing mock request: ${req.method} ${req.path}`);
+      logger.info(`Query params before mock injection: ${JSON.stringify(req.query)}`);
+      injectMockValues(req);
+      logger.info(`Query params after mock injection: ${JSON.stringify(req.query)}`);
       next();
     });
   }

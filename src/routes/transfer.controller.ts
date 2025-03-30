@@ -28,6 +28,34 @@ export class TransferController extends Controller {
   }
 
   /**
+   * Get wallet type mapping.
+   * Retrieves the mapping between Cede unified wallet types and exchange-specific wallet types.
+   * Helps understand the correspondence between different naming conventions.
+   */
+  @Get('wallet-type-mapping')
+  @Response<ErrorResponse>(401, 'Unauthorized')
+  @Response<ErrorResponse>(403, 'Forbidden')
+  @Response<ErrorResponse>(400, 'Bad Request')
+  @Response<ErrorResponse>(404, 'Not Found')
+  @Response<ErrorResponse>(408, 'Request Timeout')
+  @Response<ErrorResponse>(429, 'Too Many Requests')
+  @Response<ErrorResponse>(500, 'Internal Server Error')
+  @Response<ErrorResponse>(503, 'Service Unavailable')
+  public async getWalletTypeMapping(
+    @Header('x-exchange-instance-id') exchangeInstanceId: string,
+    @Header('x-exchange-id') exchangeId: string,
+    @Header('x-exchange-api-key') apiKey: string,
+    @Header('x-exchange-api-secret') secretKey: string,
+    @Header('x-exchange-api-password') password?: string,
+    @Header('x-exchange-api-uid') uid?: string,
+  ): Promise<WalletTypeMappingResponse> {
+    return await this.sdk.api.getWalletTypeMapping({
+      exchangeInstanceId,
+      auth: { exchangeId, apiKey, secretKey, password, uid }
+    });
+  }
+
+  /**
    * Get internal transfer routes.
    * Retrieves all possible transfer routes between different wallet types.
    * Returns a mapping of source wallet types to allowed destination wallet types.
@@ -88,33 +116,6 @@ export class TransferController extends Controller {
     });
   }
 
-  /**
-   * Get wallet type mapping.
-   * Retrieves the mapping between Cede unified wallet types and exchange-specific wallet types.
-   * Helps understand the correspondence between different naming conventions.
-   */
-  @Get('wallet-type-mapping')
-  @Response<ErrorResponse>(401, 'Unauthorized')
-  @Response<ErrorResponse>(403, 'Forbidden')
-  @Response<ErrorResponse>(400, 'Bad Request')
-  @Response<ErrorResponse>(404, 'Not Found')
-  @Response<ErrorResponse>(408, 'Request Timeout')
-  @Response<ErrorResponse>(429, 'Too Many Requests')
-  @Response<ErrorResponse>(500, 'Internal Server Error')
-  @Response<ErrorResponse>(503, 'Service Unavailable')
-  public async getWalletTypeMapping(
-    @Header('x-exchange-instance-id') exchangeInstanceId: string,
-    @Header('x-exchange-id') exchangeId: string,
-    @Header('x-exchange-api-key') apiKey: string,
-    @Header('x-exchange-api-secret') secretKey: string,
-    @Header('x-exchange-api-password') password?: string,
-    @Header('x-exchange-api-uid') uid?: string,
-  ): Promise<WalletTypeMappingResponse> {
-    return await this.sdk.api.getWalletTypeMapping({
-      exchangeInstanceId,
-      auth: { exchangeId, apiKey, secretKey, password, uid }
-    });
-  }
 }
 
 export function transferRoutes(sdk: any) {

@@ -7,6 +7,223 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"InternalChainId": {
+				"type": "string"
+			},
+			"TokenSymbol": {
+				"type": "string"
+			},
+			"WhitelistedAddresses": {
+				"properties": {
+					"verified": {
+						"type": "boolean"
+					},
+					"tokenSymbol": {
+						"$ref": "#/components/schemas/TokenSymbol"
+					},
+					"network": {
+						"$ref": "#/components/schemas/InternalChainId"
+					},
+					"key": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"verified",
+					"network",
+					"key",
+					"address"
+				],
+				"type": "object"
+			},
+			"ReturnType_CedeSDK-at-api_91_getWhitelistedAddresses_93__": {
+				"items": {
+					"$ref": "#/components/schemas/WhitelistedAddresses"
+				},
+				"type": "array",
+				"description": "Obtain the return type of a function type"
+			},
+			"GetWhitelistedAddressesResponse": {
+				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWhitelistedAddresses_93__"
+			},
+			"ErrorResponse": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"code": {
+						"type": "number",
+						"format": "double"
+					},
+					"message": {
+						"type": "string"
+					},
+					"originalErrorMessage": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"code",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetWhitelistedAddressesParams": {
+				"properties": {
+					"tokenSymbol": {
+						"type": "string"
+					},
+					"network": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_Partial_Fee_2_.Exclude_keyofPartial_Fee_2_.refAmount__": {
+				"properties": {
+					"tokenSymbol": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_Partial_Fee_2_.refAmount_": {
+				"$ref": "#/components/schemas/Pick_Partial_Fee_2_.Exclude_keyofPartial_Fee_2_.refAmount__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"GetWithdrawalFeeReturn": {
+				"$ref": "#/components/schemas/Omit_Partial_Fee_2_.refAmount_"
+			},
+			"ReturnType_CedeSDK-at-api_91_getWithdrawalFee_93__": {
+				"$ref": "#/components/schemas/GetWithdrawalFeeReturn",
+				"description": "Obtain the return type of a function type"
+			},
+			"GetWithdrawalFeeResponse": {
+				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWithdrawalFee_93__"
+			},
+			"GetWithdrawalFeeParams": {
+				"properties": {
+					"tokenSymbol": {
+						"type": "string"
+					},
+					"network": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"key": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"tokenSymbol",
+					"network",
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PrepareWithdrawalResponse": {
+				"properties": {
+					"isValid": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"isValid"
+				],
+				"type": "object"
+			},
+			"Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__": {
+				"properties": {
+					"tokenSymbol": {
+						"type": "string"
+					},
+					"network": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
+					"isInternalTransfer": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"tokenSymbol",
+					"network"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_": {
+				"$ref": "#/components/schemas/Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"AuthParams": {
+				"properties": {
+					"uid": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"secretKey": {
+						"type": "string"
+					},
+					"apiKey": {
+						"type": "string"
+					},
+					"exchangeId": {
+						"type": "string"
+					},
+					"exchangeInstanceId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"secretKey",
+					"apiKey",
+					"exchangeId",
+					"exchangeInstanceId"
+				],
+				"type": "object"
+			},
+			"PrepareWithdrawalParams": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_"
+					},
+					{
+						"properties": {
+							"amount": {
+								"type": "string"
+							},
+							"auth": {
+								"$ref": "#/components/schemas/AuthParams"
+							}
+						},
+						"required": [
+							"amount",
+							"auth"
+						],
+						"type": "object"
+					}
+				]
+			},
 			"WalletType": {
 				"enum": [
 					"spot",
@@ -25,9 +242,6 @@
 					"unified",
 					"unknown"
 				],
-				"type": "string"
-			},
-			"TokenSymbol": {
 				"type": "string"
 			},
 			"Fee_2": {
@@ -161,9 +375,6 @@
 					}
 				]
 			},
-			"InternalChainId": {
-				"type": "string"
-			},
 			"DefiInfoTx": {
 				"properties": {
 					"transaction": {
@@ -276,37 +487,6 @@
 				],
 				"type": "object"
 			},
-			"ReturnType_CedeSDK-at-api_91_getWithdrawalById_93__": {
-				"$ref": "#/components/schemas/PureTransaction_PureCefiInfoTx.PureCefiInfoTx-or-DefiInfoTx_",
-				"description": "Obtain the return type of a function type"
-			},
-			"GetWithdrawalByIdResponse": {
-				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWithdrawalById_93__"
-			},
-			"ErrorResponse": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"code": {
-						"type": "number",
-						"format": "double"
-					},
-					"message": {
-						"type": "string"
-					},
-					"originalErrorMessage": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"name",
-					"code",
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"ReturnType_CedeSDK-at-api_91_createWithdrawal_93__": {
 				"$ref": "#/components/schemas/PureTransaction_PureCefiInfoTx.PureCefiInfoTx-or-DefiInfoTx_",
 				"description": "Obtain the return type of a function type"
@@ -319,11 +499,14 @@
 					"tokenSymbol": {
 						"type": "string"
 					},
+					"network": {
+						"type": "string"
+					},
 					"address": {
 						"type": "string"
 					},
-					"network": {
-						"type": "string"
+					"isInternalTransfer": {
+						"type": "boolean"
 					},
 					"totpCode": {
 						"type": "string"
@@ -333,9 +516,6 @@
 					},
 					"clientTxId": {
 						"type": "string"
-					},
-					"isInternalTransfer": {
-						"type": "boolean"
 					}
 				},
 				"required": [
@@ -348,35 +528,6 @@
 			"Omit_OriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_": {
 				"$ref": "#/components/schemas/Pick_OriginalCreateWithdrawalParams.Exclude_keyofOriginalCreateWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__",
 				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"AuthParams": {
-				"properties": {
-					"uid": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"secretKey": {
-						"type": "string"
-					},
-					"apiKey": {
-						"type": "string"
-					},
-					"exchangeId": {
-						"type": "string"
-					},
-					"exchangeInstanceId": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"secretKey",
-					"apiKey",
-					"exchangeId",
-					"exchangeInstanceId"
-				],
-				"type": "object"
 			},
 			"CreateWithdrawalParams": {
 				"allOf": [
@@ -400,190 +551,24 @@
 					}
 				]
 			},
-			"PrepareWithdrawalResponse": {
-				"properties": {
-					"isValid": {
-						"type": "boolean"
-					}
-				},
-				"required": [
-					"isValid"
-				],
-				"type": "object"
-			},
-			"Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__": {
-				"properties": {
-					"tokenSymbol": {
-						"type": "string"
-					},
-					"address": {
-						"type": "string"
-					},
-					"network": {
-						"type": "string"
-					},
-					"isInternalTransfer": {
-						"type": "boolean"
-					}
-				},
-				"required": [
-					"tokenSymbol",
-					"network"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_": {
-				"$ref": "#/components/schemas/Pick_OriginalPrepareWithdrawalParams.Exclude_keyofOriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"PrepareWithdrawalParams": {
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/Omit_OriginalPrepareWithdrawalParams.fromExchange-or-toExchange-or-readonlyExchange-or-amount_"
-					},
-					{
-						"properties": {
-							"amount": {
-								"type": "string"
-							},
-							"auth": {
-								"$ref": "#/components/schemas/AuthParams"
-							}
-						},
-						"required": [
-							"amount",
-							"auth"
-						],
-						"type": "object"
-					}
-				]
-			},
-			"Pick_Partial_Fee_2_.Exclude_keyofPartial_Fee_2_.refAmount__": {
-				"properties": {
-					"tokenSymbol": {
-						"type": "string"
-					},
-					"amount": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_Partial_Fee_2_.refAmount_": {
-				"$ref": "#/components/schemas/Pick_Partial_Fee_2_.Exclude_keyofPartial_Fee_2_.refAmount__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"GetWithdrawalFeeReturn": {
-				"$ref": "#/components/schemas/Omit_Partial_Fee_2_.refAmount_"
-			},
-			"ReturnType_CedeSDK-at-api_91_getWithdrawalFee_93__": {
-				"$ref": "#/components/schemas/GetWithdrawalFeeReturn",
+			"ReturnType_CedeSDK-at-api_91_getWithdrawalById_93__": {
+				"$ref": "#/components/schemas/PureTransaction_PureCefiInfoTx.PureCefiInfoTx-or-DefiInfoTx_",
 				"description": "Obtain the return type of a function type"
 			},
-			"GetWithdrawalFeeResponse": {
-				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWithdrawalFee_93__"
+			"GetWithdrawalByIdResponse": {
+				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWithdrawalById_93__"
 			},
-			"GetWithdrawalFeeParams": {
-				"properties": {
-					"tokenSymbol": {
-						"type": "string"
-					},
-					"network": {
-						"type": "string"
-					},
-					"amount": {
-						"type": "number",
-						"format": "double"
-					},
-					"key": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"tokenSymbol",
-					"network",
-					"amount"
-				],
+			"Record_WalletType.string_": {
+				"properties": {},
 				"type": "object",
-				"additionalProperties": false
+				"description": "Construct a type with a set of properties K of type T"
 			},
-			"ReturnType_CedeSDK-at-api_91_checkAddressIsWhitelisted_93__": {
-				"type": "boolean",
+			"ReturnType_CedeSDK-at-api_91_getWalletTypeMapping_93__": {
+				"$ref": "#/components/schemas/Record_WalletType.string_",
 				"description": "Obtain the return type of a function type"
 			},
-			"CheckAddressIsWhitelistedResponse": {
-				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_checkAddressIsWhitelisted_93__"
-			},
-			"CheckAddressIsWhitelistedParams": {
-				"properties": {
-					"address": {
-						"type": "string"
-					},
-					"tokenSymbol": {
-						"type": "string"
-					},
-					"key": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"address",
-					"tokenSymbol",
-					"key"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"WhitelistedAddresses": {
-				"properties": {
-					"verified": {
-						"type": "boolean"
-					},
-					"tokenSymbol": {
-						"$ref": "#/components/schemas/TokenSymbol"
-					},
-					"network": {
-						"$ref": "#/components/schemas/InternalChainId"
-					},
-					"key": {
-						"type": "string"
-					},
-					"address": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"verified",
-					"network",
-					"key",
-					"address"
-				],
-				"type": "object"
-			},
-			"ReturnType_CedeSDK-at-api_91_getWhitelistedAddresses_93__": {
-				"items": {
-					"$ref": "#/components/schemas/WhitelistedAddresses"
-				},
-				"type": "array",
-				"description": "Obtain the return type of a function type"
-			},
-			"GetWhitelistedAddressesResponse": {
-				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWhitelistedAddresses_93__"
-			},
-			"GetWhitelistedAddressesParams": {
-				"properties": {
-					"tokenSymbol": {
-						"type": "string"
-					},
-					"network": {
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"additionalProperties": false
+			"WalletTypeMappingResponse": {
+				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWalletTypeMapping_93__"
 			},
 			"Record_WalletType.WalletType-Array_": {
 				"properties": {},
@@ -645,18 +630,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"Record_WalletType.string_": {
-				"properties": {},
-				"type": "object",
-				"description": "Construct a type with a set of properties K of type T"
-			},
-			"ReturnType_CedeSDK-at-api_91_getWalletTypeMapping_93__": {
-				"$ref": "#/components/schemas/Record_WalletType.string_",
-				"description": "Obtain the return type of a function type"
-			},
-			"WalletTypeMappingResponse": {
-				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getWalletTypeMapping_93__"
 			},
 			"PairSymbol": {
 				"type": "string"
@@ -854,7 +827,7 @@
 						},
 						"type": "object"
 					},
-					"recaptchaToken": {
+					"turnstileToken": {
 						"type": "string"
 					},
 					"amount": {
@@ -1063,7 +1036,7 @@
 					"orderType": {
 						"$ref": "#/components/schemas/OrderType"
 					},
-					"recaptchaToken": {
+					"turnstileToken": {
 						"type": "string"
 					},
 					"metadata": {
@@ -1389,14 +1362,10 @@
 						"properties": {
 							"auth": {
 								"$ref": "#/components/schemas/AuthParams"
-							},
-							"exchangeInstanceId": {
-								"type": "string"
 							}
 						},
 						"required": [
-							"auth",
-							"exchangeInstanceId"
+							"auth"
 						],
 						"type": "object"
 					}
@@ -1585,6 +1554,18 @@
 			"GetAvailableNetworksResponse": {
 				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getAvailableNetworks_93__"
 			},
+			"ReturnType_CedeSDK-at-api_91_checkCredentials_93__": {
+				"properties": {
+					"isValid": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"isValid"
+				],
+				"type": "object",
+				"description": "Obtain the return type of a function type"
+			},
 			"GetOAuthUrlResponse": {
 				"properties": {
 					"codeVerifier": {
@@ -1603,24 +1584,13 @@
 				"$ref": "#/components/schemas/GetOAuthUrlResponse",
 				"description": "Obtain the return type of a function type"
 			},
-			"ApiPermissions": {
-				"enum": [
-					"trade",
-					"read",
-					"withdraw"
-				],
-				"type": "string"
-			},
 			"GetOAuthUrlParams": {
 				"properties": {
 					"redirectUri": {
 						"type": "string"
 					},
 					"permissions": {
-						"items": {
-							"$ref": "#/components/schemas/ApiPermissions"
-						},
-						"type": "array"
+						"type": "string"
 					},
 					"deviceId": {
 						"type": "string"
@@ -1686,104 +1656,32 @@
 				],
 				"type": "object"
 			},
-			"ReturnType_CedeSDK-at-api_91_refreshToken_93__": {
-				"description": "Obtain the return type of a function type"
-			},
-			"StorageType": {
-				"enum": [
-					"browser",
-					"phone",
-					"ledger",
-					"server"
-				],
-				"type": "string"
-			},
-			"PublicApiKey": {
+			"DepositableToken": {
 				"properties": {
-					"uid": {
-						"type": "string"
-					},
-					"apiPublic": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"apiPublic"
-				],
-				"type": "object"
-			},
-			"ApiKey": {
-				"allOf": [
-					{
-						"properties": {
-							"storage": {
-								"$ref": "#/components/schemas/StorageType"
-							},
-							"passphrase": {
-								"type": "string"
-							},
-							"apiSecret": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"storage",
-							"apiSecret"
-						],
-						"type": "object"
-					},
-					{
-						"$ref": "#/components/schemas/PublicApiKey"
-					}
-				]
-			},
-			"GetFastApiKeysParams": {
-				"properties": {
-					"accessToken": {
-						"type": "string"
-					},
-					"permissions": {
+					"networks": {
 						"items": {
-							"$ref": "#/components/schemas/ApiPermissions"
+							"$ref": "#/components/schemas/MarketNetwork"
 						},
 						"type": "array"
+					},
+					"tokenSymbol": {
+						"$ref": "#/components/schemas/TokenSymbol"
 					}
 				},
 				"required": [
-					"accessToken"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"OAuthClientCredentialsParams": {
-				"properties": {
-					"clientSecret": {
-						"type": "string"
-					},
-					"clientId": {
-						"type": "string"
-					},
-					"exchangeId": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"clientId",
-					"exchangeId"
+					"tokenSymbol"
 				],
 				"type": "object"
 			},
-			"ReturnType_CedeSDK-at-api_91_checkCredentials_93__": {
-				"properties": {
-					"isValid": {
-						"type": "boolean"
-					}
+			"ReturnType_CedeSDK-at-api_91_getDepositableTokens_93__": {
+				"items": {
+					"$ref": "#/components/schemas/DepositableToken"
 				},
-				"required": [
-					"isValid"
-				],
-				"type": "object",
+				"type": "array",
 				"description": "Obtain the return type of a function type"
+			},
+			"GetDepositableTokensResponse": {
+				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getDepositableTokens_93__"
 			},
 			"DepositAddress": {
 				"properties": {
@@ -1889,6 +1787,18 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"OnDepositResponse": {
+				"properties": {
+					"registered": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"registered"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"OnDepositParams": {
 				"properties": {
 					"callbackHeaders": {
@@ -1916,46 +1826,15 @@
 					},
 					"auth": {
 						"$ref": "#/components/schemas/AuthParams"
-					},
-					"exchangeInstanceId": {
-						"type": "string"
 					}
 				},
 				"required": [
 					"callbackUrl",
 					"tokenSymbol",
 					"txHash",
-					"auth",
-					"exchangeInstanceId"
+					"auth"
 				],
 				"type": "object"
-			},
-			"DepositableToken": {
-				"properties": {
-					"networks": {
-						"items": {
-							"$ref": "#/components/schemas/MarketNetwork"
-						},
-						"type": "array"
-					},
-					"tokenSymbol": {
-						"$ref": "#/components/schemas/TokenSymbol"
-					}
-				},
-				"required": [
-					"tokenSymbol"
-				],
-				"type": "object"
-			},
-			"ReturnType_CedeSDK-at-api_91_getDepositableTokens_93__": {
-				"items": {
-					"$ref": "#/components/schemas/DepositableToken"
-				},
-				"type": "array",
-				"description": "Obtain the return type of a function type"
-			},
-			"GetDepositableTokensResponse": {
-				"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getDepositableTokens_93__"
 			},
 			"ExchangeStatus": {
 				"enum": [
@@ -1964,6 +1843,14 @@
 					"error",
 					"maintenance",
 					"unknown"
+				],
+				"type": "string"
+			},
+			"ApiPermissions": {
+				"enum": [
+					"trade",
+					"read",
+					"withdraw"
 				],
 				"type": "string"
 			},
@@ -2119,9 +2006,6 @@
 					"provideWhitelistedAddresses": {
 						"type": "boolean"
 					},
-					"shouldCheckWhitelist": {
-						"type": "boolean"
-					},
 					"isRequiringAddressWhitelisting": {
 						"type": "boolean"
 					},
@@ -2187,7 +2071,6 @@
 					"featuresUnderMaintenance",
 					"ipWhitelistAddresses",
 					"provideWhitelistedAddresses",
-					"shouldCheckWhitelist",
 					"isRequiringAddressWhitelisting",
 					"isRequiringEmailConfirmation",
 					"authenticationMethod",
@@ -2261,16 +2144,16 @@
 		"contact": {}
 	},
 	"paths": {
-		"/withdrawal/{withdrawalId}": {
+		"/withdrawal/whitelisted-addresses": {
 			"get": {
-				"operationId": "GetWithdrawalById",
+				"operationId": "GetWhitelistedAddresses",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetWithdrawalByIdResponse"
+									"$ref": "#/components/schemas/GetWhitelistedAddressesResponse"
 								}
 							}
 						}
@@ -2356,48 +2239,23 @@
 						}
 					}
 				},
-				"description": "Get withdrawal by ID.\nRetrieves details of a specific withdrawal transaction.\nIncludes status, amount, and network information.",
+				"description": "Get whitelisted addresses.\nRetrieves all whitelisted withdrawal addresses for an exchange.\nCan be filtered by token and network.\n\nTo know whether an exchange supports address whitelisting, check the `provideWhitelistedAddresses` field in the exchange information returned by \nthe `/supported` endpoint. \n\nTo determine whether an exchange requires address whitelisting for withdrawals, check the `isRequiringAddressWhitelisting` field in the exchange information returned by \nthe `/supported` endpoint.",
 				"tags": [
 					"Withdrawal"
 				],
 				"security": [],
 				"parameters": [
 					{
-						"in": "path",
-						"name": "withdrawalId",
+						"in": "header",
+						"name": "x-exchange-id",
 						"required": true,
 						"schema": {
 							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "tokenSymbol",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "timestamp",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
 						}
 					},
 					{
 						"in": "header",
 						"name": "x-exchange-instance-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -2434,244 +2292,24 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"in": "query",
+						"name": "tokenSymbol",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "network",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				]
-			}
-		},
-		"/withdrawal": {
-			"post": {
-				"operationId": "CreateWithdrawal",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/CreateWithdrawalResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"402": {
-						"description": "Insufficient balance",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Create a new withdrawal.\nInitiates a withdrawal transaction from the exchange.\nRequires proper authentication and withdrawal address verification.",
-				"tags": [
-					"Withdrawal"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/CreateWithdrawalParams"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/withdrawal/prepare": {
-			"post": {
-				"operationId": "PrepareWithdrawal",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/PrepareWithdrawalResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Prepare withdrawal transaction.\nCalculates fees and validates withdrawal parameters before execution.\nReturns a prepared transaction object for confirmation.",
-				"tags": [
-					"Withdrawal"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/PrepareWithdrawalParams"
-							}
-						}
-					}
-				}
 			}
 		},
 		"/withdrawal/fee": {
@@ -2859,16 +2497,16 @@
 				]
 			}
 		},
-		"/withdrawal/whitelisted-addresses/check": {
-			"get": {
-				"operationId": "CheckAddressIsWhitelisted",
+		"/withdrawal/prepare": {
+			"post": {
+				"operationId": "PrepareWithdrawal",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/CheckAddressIsWhitelistedResponse"
+									"$ref": "#/components/schemas/PrepareWithdrawalResponse"
 								}
 							}
 						}
@@ -2954,12 +2592,273 @@
 						}
 					}
 				},
-				"description": "Check if a withdrawal address is in the exchange's whitelist.\nMost of the exchanges require the withdrawal address to be whitelisted.",
+				"description": "Prepare withdrawal transaction.\nCalculates fees and validates withdrawal parameters before execution.\nReturns true if the withdrawal is valid, error otherwise.",
+				"tags": [
+					"Withdrawal"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PrepareWithdrawalParams"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/withdrawal": {
+			"post": {
+				"operationId": "CreateWithdrawal",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CreateWithdrawalResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"402": {
+						"description": "Insufficient balance",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"408": {
+						"description": "Request Timeout",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Service Unavailable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Create a new withdrawal.\nInitiates a withdrawal transaction from the exchange.\nRequires proper authentication and withdrawal address verification.\n\nTo determine whether an exchange requires address whitelisting for withdrawals, check the `isRequiringAddressWhitelisting` field in the exchange information returned by \nthe `/supported` endpoint. \n\nFor exchanges that support address whitelisting, retrieve the list of whitelisted addresses using the `/whitelisted-addresses` endpoint and verify \nthat the destination address is approved. This verification is particularly important when an exchange mandates address whitelisting for withdrawals.",
+				"tags": [
+					"Withdrawal"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateWithdrawalParams"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/withdrawal/{withdrawalId}": {
+			"get": {
+				"operationId": "GetWithdrawalById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetWithdrawalByIdResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"408": {
+						"description": "Request Timeout",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Service Unavailable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get withdrawal by ID.\nRetrieves details of a specific withdrawal transaction.\nIncludes status, amount, and network information.",
 				"tags": [
 					"Withdrawal"
 				],
 				"security": [],
 				"parameters": [
+					{
+						"in": "path",
+						"name": "withdrawalId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenSymbol",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "timestamp",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
 					{
 						"in": "header",
 						"name": "x-exchange-instance-id",
@@ -3004,30 +2903,6 @@
 						"in": "header",
 						"name": "x-exchange-api-uid",
 						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "address",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "tokenSymbol",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "key",
-						"required": true,
 						"schema": {
 							"type": "string"
 						}
@@ -3035,16 +2910,16 @@
 				]
 			}
 		},
-		"/withdrawal/whitelisted-addresses": {
+		"/transfer/wallet-type-mapping": {
 			"get": {
-				"operationId": "GetWhitelistedAddresses",
+				"operationId": "GetWalletTypeMapping",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetWhitelistedAddressesResponse"
+									"$ref": "#/components/schemas/WalletTypeMappingResponse"
 								}
 							}
 						}
@@ -3130,15 +3005,15 @@
 						}
 					}
 				},
-				"description": "Get whitelisted addresses.\nRetrieves all whitelisted withdrawal addresses for an exchange.\nCan be filtered by token and network.",
+				"description": "Get wallet type mapping.\nRetrieves the mapping between Cede unified wallet types and exchange-specific wallet types.\nHelps understand the correspondence between different naming conventions.",
 				"tags": [
-					"Withdrawal"
+					"Transfer"
 				],
 				"security": [],
 				"parameters": [
 					{
 						"in": "header",
-						"name": "x-exchange-id",
+						"name": "x-exchange-instance-id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -3146,7 +3021,7 @@
 					},
 					{
 						"in": "header",
-						"name": "x-exchange-instance-id",
+						"name": "x-exchange-id",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -3179,22 +3054,6 @@
 					{
 						"in": "header",
 						"name": "x-exchange-api-uid",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "tokenSymbol",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "network",
 						"required": false,
 						"schema": {
 							"type": "string"
@@ -3466,158 +3325,6 @@
 						}
 					}
 				}
-			}
-		},
-		"/transfer/wallet-type-mapping": {
-			"get": {
-				"operationId": "GetWalletTypeMapping",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/WalletTypeMappingResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get wallet type mapping.\nRetrieves the mapping between Cede unified wallet types and exchange-specific wallet types.\nHelps understand the correspondence between different naming conventions.",
-				"tags": [
-					"Transfer"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "x-exchange-instance-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-key",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-secret",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-password",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-uid",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
 			}
 		},
 		"/trade/market-pairs": {
@@ -6443,878 +6150,6 @@
 				]
 			}
 		},
-		"/auth/oauth/url": {
-			"get": {
-				"operationId": "GetOAuthUrl",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getOAuthUrl_93__"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get OAuth URL for authorization",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "x-exchange-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "redirectUri",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "permissions",
-						"required": true,
-						"schema": {
-							"type": "array",
-							"items": {
-								"$ref": "#/components/schemas/ApiPermissions"
-							}
-						}
-					},
-					{
-						"in": "query",
-						"name": "deviceId",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/auth/oauth/tokens": {
-			"post": {
-				"operationId": "GetOAuthTokens",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getOAuthTokens_93__"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get OAuth tokens using authorization code",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/GetOAuthTokensParams"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/oauth/check-and-refresh": {
-			"post": {
-				"operationId": "CheckOAuthAndRefresh",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Check and refresh OAuth tokens if needed.\nAutomatically refreshes expired OAuth tokens and returns the updated tokens.",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"exchangeId": {
-										"type": "string"
-									},
-									"exchangeInstanceId": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"exchangeId",
-									"exchangeInstanceId"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/oauth/revoke": {
-			"post": {
-				"operationId": "RevokeOAuth",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Revoke OAuth access",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"exchangeId": {
-										"type": "string"
-									},
-									"exchangeInstanceId": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"exchangeId",
-									"exchangeInstanceId"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/oauth/refresh": {
-			"post": {
-				"operationId": "RefreshToken",
-				"responses": {
-					"204": {
-						"description": "No content"
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Refresh OAuth token",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"refreshToken": {
-										"type": "string"
-									},
-									"exchangeId": {
-										"type": "string"
-									},
-									"exchangeInstanceId": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"refreshToken",
-									"exchangeId",
-									"exchangeInstanceId"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/fast-api-keys": {
-			"get": {
-				"operationId": "GetFastApiKeys",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ApiKey"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get fast API keys for an exchange.\nRetrieves API keys with specified permissions for rapid access.",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "x-exchange-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "accessToken",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "query",
-						"name": "permissions",
-						"required": false,
-						"schema": {
-							"type": "array",
-							"items": {
-								"$ref": "#/components/schemas/ApiPermissions"
-							}
-						}
-					}
-				]
-			}
-		},
-		"/auth/oauth/client-credentials": {
-			"post": {
-				"operationId": "SetupOAuthClientCredentials",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Setup OAuth client credentials",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/OAuthClientCredentialsParams"
-							}
-						}
-					}
-				}
-			}
-		},
 		"/auth/check-credentials": {
 			"post": {
 				"operationId": "CheckCredentials",
@@ -7452,6 +6287,387 @@
 						}
 					}
 				}
+			}
+		},
+		"/auth/oauth/url": {
+			"get": {
+				"operationId": "GetOAuthUrl",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getOAuthUrl_93__"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"408": {
+						"description": "Request Timeout",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Service Unavailable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get OAuth URL for authorization",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-exchange-id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "redirectUri",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "permissions",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "deviceId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/oauth/tokens": {
+			"post": {
+				"operationId": "GetOAuthTokens",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReturnType_CedeSDK-at-api_91_getOAuthTokens_93__"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"408": {
+						"description": "Request Timeout",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Service Unavailable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get OAuth tokens using authorization code",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetOAuthTokensParams"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/deposit/tokens": {
+			"get": {
+				"operationId": "GetDepositableTokens",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetDepositableTokensResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"408": {
+						"description": "Request Timeout",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Too Many Requests",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Service Unavailable",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get all tokens that can be deposited on the exchange.\nThe response includes network information for most of the exchanges allowing\nto retrieve it without querying per token. For the exchanges that don't \nnetworks in depositable tokens, please use `/networks` endpoint with `toDeposit: true` flag.",
+				"tags": [
+					"Deposit"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "x-exchange-instance-id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-exchange-id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-exchange-api-key",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-exchange-api-secret",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-exchange-api-password",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-exchange-api-uid",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/deposit/address": {
@@ -7794,8 +7010,15 @@
 			"post": {
 				"operationId": "OnDeposit",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OnDepositResponse"
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "Bad Request",
@@ -7894,158 +7117,6 @@
 						}
 					}
 				}
-			}
-		},
-		"/deposit/tokens": {
-			"get": {
-				"operationId": "GetDepositableTokens",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GetDepositableTokensResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad Request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"403": {
-						"description": "Forbidden",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Not Found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"408": {
-						"description": "Request Timeout",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"429": {
-						"description": "Too Many Requests",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Internal Server Error",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"503": {
-						"description": "Service Unavailable",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"description": "Get all tokens that can be deposited on the exchange.\nThe response includes network information for most of the exchanges allowing\nto retrieve it without querying per token. For the exchanges that don't \nnetworks in depositable tokens, please use `/networks` endpoint with `toDeposit: true` flag.",
-				"tags": [
-					"Deposit"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "x-exchange-instance-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-id",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-key",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-secret",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-password",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-exchange-api-uid",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
 			}
 		},
 		"/exchange/supported": {
