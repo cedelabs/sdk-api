@@ -23,13 +23,20 @@ export async function sdkApi(configuration: SdkApiConfiguration) {
   const port = process.env.APP_PORT || 3000;
 
   process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception:', error);
-    startGracefulShutdown();
+    logger.error('Uncaught Exception - process state is unreliable:', error);
+    // Uncaught exceptions indicate bugs and leave the process in an undefined state
+    // Shutdown gracefully after logging to allow process manager to restart
+    setTimeout(() => {
+      startGracefulShutdown();
+    }, 1000);
   });
 
-  process.on('unhandledRejection', (error) => {
-    logger.error('Unhandled Rejection:', error);
-    startGracefulShutdown();
+  process.on('unhandledRejection', (error, promise) => {
+    logger.error('[DEBUG UNHANDLED] Caught unhandled rejection:', error);
+    logger.error('[DEBUG UNHANDLED] Promise:', promise);
+    logger.error('[DEBUG UNHANDLED] Stack trace:', (error as Error)?.stack);
+    // Don't crash - these can occur from race conditions in parallel async operations
+    // Individual request errors are handled by route-level error handlers
   });
 
   function startGracefulShutdown() {

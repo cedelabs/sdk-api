@@ -2283,7 +2283,7 @@
 	},
 	"info": {
 		"title": "@cedelabs/sdk-http-api",
-		"version": "1.4.2",
+		"version": "1.4.3",
 		"license": {
 			"name": "MIT"
 		},
